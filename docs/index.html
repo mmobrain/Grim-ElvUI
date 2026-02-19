@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PE-ElvUI Documentation</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css">
+    <style>
+        body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 45px;
+        }
+
+        @media (max-width: 767px) {
+            body {
+                padding: 15px;
+            }
+        }
+
+        .nav-links {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eaecef;
+        }
+
+        .nav-links a {
+            margin-right: 15px;
+            text-decoration: none;
+            color: #0366d6;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body class="markdown-body">
+    <div class="nav-links">
+        <a onclick="loadContent('README.md')">Home</a>
+        <a onclick="loadContent('CHANGELOG.md')">Changelog</a>
+        <a href="https://github.com/Xurkon/PE-ElvUI" target="_blank">GitHub Repository</a>
+    </div>
+    <div id="content">Loading documentation...</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        async function loadContent(file) {
+            try {
+                const response = await fetch(file);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const text = await response.text();
+                // Fix relative links in markdown to absolute github links if needed, 
+                // but for now just render raw.
+                document.getElementById('content').innerHTML = marked.parse(text);
+            } catch (error) {
+                document.getElementById('content').innerHTML = `<p>Error loading ${file}: ${error.message}</p><p>Make sure the file exists in the same directory.</p>`;
+            }
+        }
+
+        // Default load
+        loadContent('README.md');
+    </script>
+</body>
+
+</html>
