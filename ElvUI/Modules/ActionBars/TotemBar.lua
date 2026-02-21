@@ -272,6 +272,15 @@ function AB:CreateTotemBar()
 	MultiCastActionBarFrame.SetParent = E.noop
 	MultiCastActionBarFrame.SetPoint = E.noop
 
+    for i=1, MultiCastActionBarFrame:GetNumRegions() do
+        local region = select(i, MultiCastActionBarFrame:GetRegions())
+        if region:IsObjectType("Texture") then
+            region:SetTexture(nil)
+            region:Hide()
+            region:SetAlpha(0)
+        end
+    end
+
 	self:HookScript(MultiCastActionBarFrame, "OnEnter", "TotemOnEnter")
 	self:HookScript(MultiCastActionBarFrame, "OnLeave", "TotemOnLeave")
 
@@ -369,6 +378,7 @@ function AB:CreateTotemBar()
 	self:SecureHook("MultiCastActionButton_Update")
 	self:SecureHook("MultiCastSlotButton_Update", "StyleTotemSlotButton")
 	self:SecureHook("MultiCastFlyoutFrame_ToggleFlyout")
+	self:SecureHook("MultiCastActionBar_Update", "PositionAndSizeBarTotem")
 	self:SecureHook("ShowMultiCastActionBar")
 
 	E:CreateMover(bar, "ElvBar_Totem", TUTORIAL_TITLE47, nil, nil, nil,"ALL,ACTIONBARS", nil, "actionbar,barTotem")

@@ -2,9 +2,9 @@
 
 # Project Ebonhold ElvUI Pack
 
-![Version](https://img.shields.io/badge/version-v6.11-blue.svg?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-v6.12-blue.svg?style=for-the-badge)
 ![Downloads](https://img.shields.io/github/downloads/Xurkon/PE-ElvUI/total?style=for-the-badge&color=e67e22)
-[![Documentation](https://img.shields.io/badge/Documentation-View%20Docs-58a6ff?style=for-the-badge)](https://xurkon.github.io/PE-ElvUI/docs/)
+[![Documentation](https://img.shields.io/badge/Documentation-View%20Docs-58a6ff?style=for-the-badge)](https://xurkon.github.io/PE-ElvUI/)
 [![Patreon](https://img.shields.io/badge/Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white)](https://www.patreon.com/Xurkon)
 [![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.me/Xurkon)
 ![Platform](https://img.shields.io/badge/PLATFORM-PROJECT%20EBONHOLD-blue?style=for-the-badge&logo=windows&logoColor=white)
@@ -42,6 +42,10 @@ This repository contains the curated ElvUI + Modules collection for **Project Eb
 ### 4. Version Check Popup Disabled
 **Issue**: ElvUI would display a "ElvUI was updated while the game is still running" popup if the version check logic triggered, even if no update had occurred (common with manual installations).
 **Fix**: Disabled the version check logic entirely to prevent false positives and unnecessary popups.
+
+### 5. Shaman Totem Bar Resize Bug
+**Issue**: Upon learning a new Totem and unlocking a new slot, the Shaman MultiCastActionBar would break, causing the newly spawned totem icon to stretch to infinite viewport limits.
+**Fix**: ElvUI's Shaman action bar code (`AB:CreateTotemBar()`) was injecting style configurations onto natively active totems but completely failed to hook WotLK's `MultiCastActionBar_Update` logic required to process dynamically spawning elements mid-session. Bound `PositionAndSizeBarTotem` to `MultiCastActionBar_Update` forcing the UI to process structural bounds on dynamically incrementing slots.
 
 ## Installation
 1. Download the latest `zip` from the [Releases](https://github.com/Xurkon/PE-ElvUI/releases) page.

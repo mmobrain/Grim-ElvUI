@@ -54,7 +54,7 @@
     <script>
         async function loadContent(file) {
             try {
-                const response = await fetch(file);
+                const response = await fetch(`https://raw.githubusercontent.com/Xurkon/PE-ElvUI/main/${file}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }

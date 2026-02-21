@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.12] - 2026-02-20
+
+### Fixed
+- **Shaman Totem Bar Scaling Bug:** Added missing hook to `MultiCastActionBar_Update` logic so that whenever a Shaman learns a new totem, ElvUI properly applies sizing boundaries to the newly unlocked slot frame. This prevents the newly unlocked totem texture from infinitely stretching across the entire game window.
+
 ## [v6.11] - 2026-02-18
 
 ### Added
