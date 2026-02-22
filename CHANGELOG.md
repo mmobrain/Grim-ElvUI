@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.16] - 2026-02-22
+
+### Fixed
+- **Shaman Totem Infinite Scaling Bug:** Resolved the underlying cause of the "viewport infinite scaling" bug for Shamans. When a totem slot became inactive (e.g. switching Totem pages or unlearning), ElvUI's internal anchor hooks (`SetAllPoints`) would receive a `nil` slot target, causing the invisible action button to default to `UIParent` and stretch enormously across the entire game screen. The anchors are now safely guarded to prevent this out-of-bounds scaling.
+
 ## [v6.15] - 2026-02-22
 
 ### Fixed

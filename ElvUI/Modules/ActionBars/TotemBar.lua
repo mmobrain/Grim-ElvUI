@@ -59,7 +59,9 @@ function AB:MultiCastActionButton_Update(button, _, _, slot)
 
 	if InCombatLockdown() then bar.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED") return end
 	button:ClearAllPoints()
-	button:SetAllPoints(button.slotButton)
+	if button.slotButton then
+		button:SetAllPoints(button.slotButton)
+	end
 end
 
 function AB:StyleTotemSlotButton(button, slot)
