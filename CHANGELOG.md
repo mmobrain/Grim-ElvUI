@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.14] - 2026-02-22
+
+### Fixed
+- **Shaman Totem Bar Crash Bug:** Fixed a typo in the `MultiCastActionBar_Update` hook introduced in v6.12 that caused the entire ActionBars module to crash upon initialization for Shamans. The hook now correctly targets `MultiCastActionBarFrame_Update`.
+- **Microbar Enhancement Compatibility:** Added fail-safe logic to `ElvUI_MicrobarEnhancement` to ensure it falls back gracefully if the internal `ElvUI_MicroBar` frame has been renamed (e.g. to `ElvUI_Ebonhold_MicroBar`), preventing a critical initialization crash.
+
 ## [v6.13] - 2026-02-22
 
 ### Fixed
