@@ -336,11 +336,11 @@ function AB:CreateTotemBar()
 		button:StyleButton()
 		button:SetTemplate("Default")
 
-		button.background:SetTexCoord(unpack(E.TexCoords))
 		button.background:SetDrawLayer("ARTWORK")
 		button.background:SetInside(button)
 
 		button.overlay:SetTexture(nil)
+		button.overlay.SetTexture = E.noop
 		bar.buttons[button] = true
 	end
 
@@ -357,6 +357,7 @@ function AB:CreateTotemBar()
 		icon:SetInside()
 
 		button.overlay:SetTexture(nil)
+		button.overlay.SetTexture = E.noop
 		normal:SetTexture(nil)
 		normal:Hide()
 		normal:SetAlpha(0)

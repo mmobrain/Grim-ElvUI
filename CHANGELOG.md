@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.15] - 2026-02-22
+
+### Fixed
+- **Shaman Totem Texture Scaling Bug:** Enforced a lockdown on Shaman Totem Action Button textures and MultiCastSlotButton texture coordinates. This prevents Blizzard's internal `MultiCastActionButton_Update` function from resetting the icons and border overlays to their un-skinned, default states—which caused them to look visually mis-scaled or squished.
+
 ## [v6.14] - 2026-02-22
 
 ### Fixed
