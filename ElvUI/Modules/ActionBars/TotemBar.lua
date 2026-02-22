@@ -85,6 +85,7 @@ function AB:SkinSummonButton(button)
 
 	highlight:SetTexture(nil)
 	normal:SetTexture(nil)
+	normal.SetTexture = E.noop
 end
 
 function AB:MultiCastFlyoutFrame_ToggleFlyout(frame, type, parent)
@@ -208,7 +209,7 @@ function AB:PositionAndSizeBarTotem()
 
 	MultiCastSummonSpellButton:ClearAllPoints()
 	MultiCastSummonSpellButton:Size(size)
-	MultiCastSummonSpellButton:Point("BOTTOMLEFT", E.Border*2, E.Border*2)
+	MultiCastSummonSpellButton:Point("BOTTOMLEFT", MultiCastActionBarFrame, "BOTTOMLEFT", E.Border*2, E.Border*2)
 
 	for i = 1, numActiveSlots do
 		local button = _G["MultiCastSlotButton"..i]
@@ -359,6 +360,7 @@ function AB:CreateTotemBar()
 		normal:SetTexture(nil)
 		normal:Hide()
 		normal:SetAlpha(0)
+		normal.SetTexture = E.noop
 
 		_G["MultiCastActionButton"..i.."HotKey"].SetVertexColor = E.noop
 

@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.13] - 2026-02-22
+
+### Fixed
+- **Shaman Totem Bar Anchoring:** Fixed an issue where Shaman totems would anchor to the center of the screen instead of the Totem Bar mover due to a silent parent-frame failure in ElvUI's internal `Point()` wrapper.
+- **Shaman Totem Textures:** Fixed a bug where Blizzard's default action button textures would return and overlay the totem icons after totem updates or summons.
+
 ## [v6.12] - 2026-02-20
 
 ### Fixed
