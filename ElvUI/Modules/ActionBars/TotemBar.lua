@@ -32,7 +32,7 @@ local SLOT_EMPTY_TCOORDS = {
 
 local oldMultiCastRecallSpellButton_Update = MultiCastRecallSpellButton_Update
 function MultiCastRecallSpellButton_Update(self)
-	if InCombatLockdown() then AB.NeedRecallButtonUpdate = true; AB:RegisterEvent("PLAYER_REGEN_ENABLED") return end
+	if InCombatLockdown() then bar.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED") return end
 
 	oldMultiCastRecallSpellButton_Update(self)
 end
@@ -178,8 +178,7 @@ end
 
 function AB:PositionAndSizeBarTotem()
 	if InCombatLockdown() then
-		AB.NeedsPositionAndSizeBarTotem = true
-		self:RegisterEvent("PLAYER_REGEN_ENABLED")
+		bar.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
 		return
 	end
 
@@ -222,6 +221,14 @@ function AB:PositionAndSizeBarTotem()
 			button:Point("LEFT", MultiCastSummonSpellButton, "RIGHT", buttonSpacing, 0)
 		else
 			button:Point("LEFT", lastButton, "RIGHT", buttonSpacing, 0)
+		end
+	end
+
+	for i = 1, 12 do
+		local actionButton = _G["MultiCastActionButton"..i]
+		if actionButton and actionButton.slotButton then
+			actionButton:ClearAllPoints()
+			actionButton:SetAllPoints(actionButton.slotButton)
 		end
 	end
 
@@ -321,7 +328,7 @@ function AB:CreateTotemBar()
 
 	hooksecurefunc(MultiCastRecallSpellButton, "SetPoint", function(self, point, attachTo, anchorPoint, xOffset, yOffset)
 		if xOffset ~= AB.db.barTotem.buttonspacing then
-			if InCombatLockdown() then AB.NeedRecallButtonUpdate = true AB:RegisterEvent("PLAYER_REGEN_ENABLED") return end
+			if InCombatLockdown() then bar.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED") return end
 
 			self:SetPoint(point, attachTo, anchorPoint, AB.db.barTotem.buttonspacing, yOffset)
 		end
@@ -366,6 +373,13 @@ function AB:CreateTotemBar()
 		_G["MultiCastActionButton"..i.."HotKey"].SetVertexColor = E.noop
 
 		E:RegisterCooldown(cooldown)
+
+		hooksecurefunc(button, "SetPoint", function(self, point, attachTo, anchorPoint, xOffset, yOffset)
+			if self.slotButton and attachTo ~= self.slotButton then
+				self:ClearAllPoints()
+				self:SetAllPoints(self.slotButton)
+			end
+		end)
 
 		bar.buttons[button] = true
 	end

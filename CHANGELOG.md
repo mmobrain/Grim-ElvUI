@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.18] - 2026-02-22
+
+### Fixed
+- **Shaman Totem Edge Cases:** Fixed an issue where MultiCastActionButtons would drift and overlap their slot buttons when learning new totems or leveling up. Also cleaned up combat-lockdown deferral events to ensure the Totem layout consistently applies as soon as the Shaman drops combat, preventing the bar from becoming unclickable or misaligned.
+
 ## [v6.17] - 2026-02-22
 
 ### Fixed
