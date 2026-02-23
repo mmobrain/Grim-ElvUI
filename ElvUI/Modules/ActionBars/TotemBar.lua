@@ -174,9 +174,7 @@ function AB:TotemOnLeave()
 	end
 end
 
-function AB:ShowMultiCastActionBar()
-	self:PositionAndSizeBarTotem()
-end
+-- Removed AB:ShowMultiCastActionBar to prevent taint
 
 function AB:PositionAndSizeBarTotem()
 	if InCombatLockdown() then
@@ -384,7 +382,6 @@ function AB:CreateTotemBar()
 	self:SecureHook("MultiCastSlotButton_Update", "StyleTotemSlotButton")
 	self:SecureHook("MultiCastFlyoutFrame_ToggleFlyout")
 	self:SecureHook("MultiCastActionBarFrame_Update", "PositionAndSizeBarTotem")
-	self:SecureHook("ShowMultiCastActionBar")
 
 	E:CreateMover(bar, "ElvBar_Totem", TUTORIAL_TITLE47, nil, nil, nil,"ALL,ACTIONBARS", nil, "actionbar,barTotem")
 end

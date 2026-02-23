@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.17] - 2026-02-22
+
+### Fixed
+- **Shaman Totem Taint Bug:** Removed a direct secure hook on `ShowMultiCastActionBar` that was triggering an `ADDON_ACTION_BLOCKED: ElvUI tried to call the protected function MultiCastActionBarFrame:Show()` when entering or leaving combat, switching stances, or clicking flyout menus. The action bar sizing and positioning are now solely handled by the safe `MultiCastActionBarFrame_Update` hook.
+
 ## [v6.16] - 2026-02-22
 
 ### Fixed
