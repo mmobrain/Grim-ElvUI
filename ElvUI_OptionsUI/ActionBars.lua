@@ -329,7 +329,7 @@ local function BuildABConfig()
 		group.barTotem = {
 			order = 2,
 			type = "group",
-			name = L["TUTORIAL_TITLE47"],
+			name = L[TUTORIAL_TITLE47],
 			guiInline = false,
 			disabled = function() return not E.ActionBars.Initialized or not E.myclass == "SHAMAN" end,
 			get = function(info) return E.db.actionbar.barTotem[info[#info]] end,
@@ -338,7 +338,7 @@ local function BuildABConfig()
 				info = {
 					order = 1,
 					type = "header",
-					name = L["TUTORIAL_TITLE47"]
+					name = L[TUTORIAL_TITLE47]
 				},
 				enabled = {
 					order = 2,

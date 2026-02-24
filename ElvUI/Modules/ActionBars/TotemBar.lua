@@ -318,6 +318,7 @@ function AB:CreateTotemBar()
 	openButton.icon:SetPoint("CENTER")
 	openButton.icon:SetTexture(E.Media.Textures.ArrowUp)
 	openButton.normalTexture:SetTexture("")
+	openButton:SetHitRectInsets(0, 0, 0, 0)
 	openButton:StyleButton()
 	openButton.hover:SetInside(openButton.backdrop)
 	openButton.pushed:SetInside(openButton.backdrop)
@@ -340,6 +341,7 @@ function AB:CreateTotemBar()
 	for i = 1, 4 do
 		local button = _G["MultiCastSlotButton"..i]
 
+		button:SetHitRectInsets(0, 0, 0, 0)
 		button:StyleButton()
 		button:SetTemplate("Default")
 
@@ -357,6 +359,7 @@ function AB:CreateTotemBar()
 		local normal = _G["MultiCastActionButton"..i.."NormalTexture"]
 		local cooldown = _G["MultiCastActionButton"..i.."Cooldown"]
 
+		button:SetHitRectInsets(0, 0, 0, 0)
 		button:StyleButton()
 
 		icon:SetTexCoord(unpack(E.TexCoords))
@@ -378,6 +381,7 @@ function AB:CreateTotemBar()
 			if self.slotButton and attachTo ~= self.slotButton then
 				self:ClearAllPoints()
 				self:SetAllPoints(self.slotButton)
+				self:SetFrameLevel(self.slotButton:GetFrameLevel() + 2)
 			end
 		end)
 
@@ -397,5 +401,5 @@ function AB:CreateTotemBar()
 	self:SecureHook("MultiCastFlyoutFrame_ToggleFlyout")
 	self:SecureHook("MultiCastActionBarFrame_Update", "PositionAndSizeBarTotem")
 
-	E:CreateMover(bar, "ElvBar_Totem", TUTORIAL_TITLE47, nil, nil, nil,"ALL,ACTIONBARS", nil, "actionbar,barTotem")
+	E:CreateMover(bar, "ElvBar_Totem", L[TUTORIAL_TITLE47], nil, nil, nil,"ALL,ACTIONBARS", nil, "actionbar,barTotem")
 end
