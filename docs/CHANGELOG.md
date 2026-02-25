@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.20] - 2026-02-25
+
+### Fixed
+- **Version Check Popup:** Removed the hardcoded version check for `ElvUI_OptionsUI` inside `Init.lua` that caused an out-of-date warning dialog to appear when opening the Options UI or toggling keybind mode.
+
 ## [v6.19] - 2026-02-23
 
 ### Fixed

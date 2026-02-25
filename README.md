@@ -2,7 +2,7 @@
 
 # Project Ebonhold ElvUI Pack
 
-![Version](https://img.shields.io/badge/version-v6.12-blue.svg?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-v6.20-blue.svg?style=for-the-badge)
 ![Downloads](https://img.shields.io/github/downloads/Xurkon/PE-ElvUI/total?style=for-the-badge&color=e67e22)
 [![Documentation](https://img.shields.io/badge/Documentation-View%20Docs-58a6ff?style=for-the-badge)](https://xurkon.github.io/PE-ElvUI/)
 [![Patreon](https://img.shields.io/badge/Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white)](https://www.patreon.com/Xurkon)
