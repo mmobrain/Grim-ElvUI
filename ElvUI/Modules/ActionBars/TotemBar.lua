@@ -39,7 +39,9 @@ end
 
 function AB:MultiCastFlyoutFrameOpenButton_Show(button, type, parent)
 	local color = type == "page" and SLOT_BORDER_COLORS.summon or SLOT_BORDER_COLORS[parent:GetID()]
-	button.backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
+	if color then
+		button.backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
+	end
 
 	button:ClearAllPoints()
 	if AB.db.barTotem.flyoutDirection == "UP" then
@@ -131,7 +133,9 @@ function AB:MultiCastFlyoutFrame_ToggleFlyout(frame, type, parent)
 				end
 			end
 
-			button:SetBackdropBorderColor(color.r, color.g, color.b)
+			if color then
+				button:SetBackdropBorderColor(color.r, color.g, color.b)
+			end
 
 			button.icon:SetTexCoord(unpack(E.TexCoords))
 		end
@@ -139,11 +143,19 @@ function AB:MultiCastFlyoutFrame_ToggleFlyout(frame, type, parent)
 
 	if type == "slot" then
 		local tCoords = SLOT_EMPTY_TCOORDS[parent:GetID()]
-		frame.buttons[1].icon:SetTexCoord(tCoords.left, tCoords.right, tCoords.top, tCoords.bottom)
+		if tCoords then
+			frame.buttons[1].icon:SetTexCoord(tCoords.left, tCoords.right, tCoords.top, tCoords.bottom)
+		end
 	end
 
-	frame.buttons[1]:SetBackdropBorderColor(color.r, color.g, color.b)
-	MultiCastFlyoutFrameCloseButton.backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
+	if color then
+		if frame.buttons[1] then
+			frame.buttons[1]:SetBackdropBorderColor(color.r, color.g, color.b)
+		end
+		if MultiCastFlyoutFrameCloseButton and MultiCastFlyoutFrameCloseButton.backdrop then
+			MultiCastFlyoutFrameCloseButton.backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
+		end
+	end
 
 	frame:ClearAllPoints()
 	MultiCastFlyoutFrameCloseButton:ClearAllPoints()
