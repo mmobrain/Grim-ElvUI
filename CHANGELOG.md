@@ -1,5 +1,10 @@
 # Changelog
 
+## [v6.23 Grimfall fork] - 2026-04-03
+
+### Fixed
+- **Game Menu Bug:** Fixed overlapping buttons in the game menu when the ElvUI_Enhanced addon was enabled.
+- **Rage Bar:** Adjusted the default gap/spacing for the Rage bar.
 
 ## [v6.22 Grimfall fork] - 2026-04-03
 

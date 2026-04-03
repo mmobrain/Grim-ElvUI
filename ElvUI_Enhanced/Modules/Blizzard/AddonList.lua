@@ -214,19 +214,19 @@ local function AddonTooltip_Update(self)
 end
 
 function mod:AddonList()
-	if IsAddOnLoaded("ACP") then return end
+	if IsAddOnLoaded('ACP') then return end
 
-	local S = E:GetModule("Skins")
+	local S = E:GetModule('Skins')
 
-	local addonList = CreateFrame("Frame", "ElvUI_AddonList", UIParent)
-	addonList:SetFrameStrata("HIGH")
+	local addonList = CreateFrame('Frame', 'ElvUI_AddonList', UIParent)
+	addonList:SetFrameStrata('HIGH')
 	addonList:Size(520, 466)
-	addonList:Point("CENTER", 0, 0)
-	addonList:SetTemplate("Transparent")
+	addonList:Point('CENTER', 0, 0)
+	addonList:SetTemplate('Transparent')
 	addonList:SetClampedToScreen(true)
 	addonList:SetMovable(true)
 	addonList:EnableMouse(true)
-	addonList:RegisterForDrag("LeftButton")
+	addonList:RegisterForDrag('LeftButton')
 	addonList:Hide()
 	tinsert(UISpecialFrames, addonList:GetName())
 
@@ -235,41 +235,37 @@ function mod:AddonList()
 
 	for i = 1, GetNumAddOns() do
 		local _, _, _, enabled, _, reason = GetAddOnInfo(i)
-		addonList.startStatus[i] = {
-			enabled = enabled,
-			reason = reason,
-			lod = IsAddOnLoadOnDemand(i)
-		}
+		addonList.startStatus[i] = { enabled = enabled, reason = reason, lod = IsAddOnLoadOnDemand(i) }
 	end
 
-	addonList:SetScript("OnDragStart", function(self)
-		if IsShiftKeyDown() then
-			self:StartMoving()
-		end
+	addonList:SetScript('OnDragStart', function(self)
+		if IsShiftKeyDown() then self:StartMoving() end
 	end)
-	addonList:SetScript("OnDragStop", function(self)
+	addonList:SetScript('OnDragStop', function(self)
 		self:StopMovingOrSizing()
 	end)
 
-	local addonTitle = addonList:CreateFontString("$parentTitle", "BACKGROUND", "GameFontNormal")
-	addonTitle:Point("TOP", 0, -7)
-	addonTitle:SetText(ADDONS)
+	local addonTitle = addonList:CreateFontString('$parentTitle', 'BACKGROUND', 'GameFontNormal')
+	addonTitle:Point('TOP', 0, -7)
+	addonTitle:SetText('ADDONS')
 
-	local cancelButton = CreateFrame("Button", "$parentCancelButton", addonList, "UIPanelButtonTemplate")
+	local cancelButton = CreateFrame('Button', '$parentCancelButton', addonList, 'UIPanelButtonTemplate')
 	cancelButton:Size(80, 22)
-	cancelButton:Point("BOTTOMRIGHT", -8, 8)
+	cancelButton:Point('BOTTOMRIGHT', -8, 8)
 	cancelButton:SetText(CANCEL)
 	S:HandleButton(cancelButton)
-	cancelButton:SetScript("OnClick", function()
+
+	cancelButton:SetScript('OnClick', function()
 		ElvUI_AddonList:Hide()
 	end)
 
-	local okayButton = CreateFrame("Button", "$parentOkayButton", addonList, "UIPanelButtonTemplate")
+	local okayButton = CreateFrame('Button', '$parentOkayButton', addonList, 'UIPanelButtonTemplate')
 	okayButton:Size(80, 22)
-	okayButton:Point("RIGHT", cancelButton, "LEFT", -7, 0)
+	okayButton:Point('RIGHT', cancelButton, 'LEFT', -7, 0)
 	okayButton:SetText(OKAY)
 	S:HandleButton(okayButton)
-	okayButton:SetScript("OnClick", function()
+
+	okayButton:SetScript('OnClick', function()
 		if ElvUI_AddonList.shouldReload then
 			ReloadUI()
 		else
@@ -277,49 +273,51 @@ function mod:AddonList()
 		end
 	end)
 
-	local enableAllButton = CreateFrame("Button", "$parentEnableAllButton", addonList, "UIPanelButtonTemplate")
+	local enableAllButton = CreateFrame('Button', '$parentEnableAllButton', addonList, 'UIPanelButtonTemplate')
 	enableAllButton:Size(120, 22)
-	enableAllButton:Point("BOTTOMLEFT", 8, 8)
-	enableAllButton:SetText(L["Enable All"])
+	enableAllButton:Point('BOTTOMLEFT', 8, 8)
+	enableAllButton:SetText(L['Enable All'])
 	S:HandleButton(enableAllButton)
-	enableAllButton:SetScript("OnClick", function()
+
+	enableAllButton:SetScript('OnClick', function()
 		EnableAllAddOns()
 		AddonList_Update()
 	end)
 
-	local disableAllButton = CreateFrame("Button", "$parentDisableAllButton", addonList, "UIPanelButtonTemplate")
+	local disableAllButton = CreateFrame('Button', '$parentDisableAllButton', addonList, 'UIPanelButtonTemplate')
 	disableAllButton:Size(120, 22)
-	disableAllButton:Point("LEFT", enableAllButton, "RIGHT", 7, 0)
-	disableAllButton:SetText(L["Disable All"])
+	disableAllButton:Point('LEFT', enableAllButton, 'RIGHT', 7, 0)
+	disableAllButton:SetText(L['Disable All'])
 	S:HandleButton(disableAllButton)
-	disableAllButton:SetScript("OnClick", function()
+
+	disableAllButton:SetScript('OnClick', function()
 		DisableAllAddOns()
 		AddonList_Update()
 	end)
 
-	addonList:SetScript("OnShow", function()
+	addonList:SetScript('OnShow', function()
 		AddonList_Update()
-		PlaySound("igMainMenuOption")
-	end)
-	addonList:SetScript("OnHide", function()
-		PlaySound("igMainMenuOptionCheckBoxOn")
+		PlaySound('igMainMenuOption')
 	end)
 
-	local scrollFrame = CreateFrame("ScrollFrame", "$parentScrollFrame", addonList, "FauxScrollFrameTemplate")
-	scrollFrame:SetTemplate("Transparent")
-	scrollFrame:Point("TOPLEFT", 8, -25)
-	scrollFrame:Point("BOTTOMRIGHT", -29, 37)
-	scrollFrame.scrollBar = _G[scrollFrame:GetName().."ScrollBar"]
+	addonList:SetScript('OnHide', function()
+		PlaySound('igMainMenuOptionCheckBoxOn')
+	end)
+
+	local scrollFrame = CreateFrame('ScrollFrame', '$parentScrollFrame', addonList, 'FauxScrollFrameTemplate')
+	scrollFrame:SetTemplate('Transparent')
+	scrollFrame:Point('TOPLEFT', 8, -25)
+	scrollFrame:Point('BOTTOMRIGHT', -29, 37)
+
+	scrollFrame.scrollBar = _G[scrollFrame:GetName()..'ScrollBar']
 	S:HandleScrollBar(scrollFrame.scrollBar)
+	scrollFrame.scrollBar:Point('TOPLEFT', scrollFrame, 'TOPRIGHT', 3, -19)
+	scrollFrame.scrollBar:Point('BOTTOMLEFT', scrollFrame, 'BOTTOMRIGHT', 3, 19)
 
-	scrollFrame.scrollBar:Point("TOPLEFT", scrollFrame, "TOPRIGHT", 3, -19)
-	scrollFrame.scrollBar:Point("BOTTOMLEFT", scrollFrame, "BOTTOMRIGHT", 3, 19)
-
-	scrollFrame:SetScript("OnVerticalScroll", function(self, offset)
+	scrollFrame:SetScript('OnVerticalScroll', function(self, offset)
 		self.scrollBar:SetValue(offset)
-		addonList.offset = floor((offset / 16) + 0.5)
+		addonList.offset = floor(offset / 16 + 0.5)
 		AddonList_Update()
-
 		if GameTooltip:IsShown() then
 			AddonTooltip_Update(GameTooltip:GetOwner())
 		end
@@ -327,7 +325,7 @@ function mod:AddonList()
 
 	local function Enable_OnClick(self)
 		AddonList_Enable(self:GetParent().id, self:GetChecked())
-		PlaySound("igMainMenuOptionCheckBoxOn")
+		PlaySound('igMainMenuOptionCheckBoxOn')
 	end
 
 	local function Load_OnClick(self)
@@ -336,91 +334,87 @@ function mod:AddonList()
 
 	local addonListEntry = {}
 	for i = 1, 20 do
-		addonListEntry[i] = CreateFrame("Button", "ElvUI_AddonListEntry"..i, scrollFrame)
+		addonListEntry[i] = CreateFrame('Button', 'ElvUI_AddonListEntry'..i, scrollFrame)
 		addonListEntry[i]:Size(scrollFrame:GetWidth() - 8, 16)
 		addonListEntry[i].id = i
 
 		if i == 1 then
-			addonListEntry[i]:Point("TOPLEFT", 4, -4)
+			addonListEntry[i]:Point('TOPLEFT', 4, -4)
 		else
-			addonListEntry[i]:Point("TOP", addonListEntry[i - 1], "BOTTOM", 0, -4)
+			addonListEntry[i]:Point('TOP', addonListEntry[i - 1], 'BOTTOM', 0, -4)
 		end
 
-		local enabled = CreateFrame("CheckButton", "$parentEnabled", addonListEntry[i])
+		local enabled = CreateFrame('CheckButton', '$parentEnabled', addonListEntry[i])
 		enabled:Size(24, 24)
-		enabled:Point("LEFT", -4, 0)
+		enabled:Point('LEFT', -4, 0)
 		S:HandleCheckBox(enabled)
 
-		local title = addonListEntry[i]:CreateFontString("$parentTitle", "BACKGROUND", "GameFontNormal")
+		local title = addonListEntry[i]:CreateFontString('$parentTitle', 'BACKGROUND', 'GameFontNormal')
 		title:Size(220, 12)
-		title:Point("LEFT", 22, 0)
-		title:SetJustifyH("LEFT")
+		title:Point('LEFT', 22, 0)
+		title:SetJustifyH('LEFT')
 
-		local status = addonListEntry[i]:CreateFontString("$parentStatus", "BACKGROUND", "GameFontNormalSmall")
+		local status = addonListEntry[i]:CreateFontString('$parentStatus', 'BACKGROUND', 'GameFontNormalSmall')
 		status:Size(220, 12)
-		status:Point("RIGHT", -22, 0)
-		status:SetJustifyH("RIGHT")
+		status:Point('RIGHT', -22, 0)
+		status:SetJustifyH('RIGHT')
 		addonListEntry[i].Status = status
 
-		local reload = addonListEntry[i]:CreateFontString("$parentReload", "BACKGROUND", "GameFontRed")
+		local reload = addonListEntry[i]:CreateFontString('$parentReload', 'BACKGROUND', 'GameFontRed')
 		reload:Size(220, 12)
-		reload:Point("RIGHT", -22, 0)
-		reload:SetJustifyH("RIGHT")
-		reload:SetText(L["Requires Reload"])
+		reload:Point('RIGHT', -22, 0)
+		reload:SetJustifyH('RIGHT')
+		reload:SetText(L['Requires Reload'])
 		addonListEntry[i].Reload = reload
 
-		local load = CreateFrame("Button", "$parentLoad", addonListEntry[i], "UIPanelButtonTemplate")
-		load:Size(100, 22)
-		load:Point("RIGHT", -21, 0)
-		load:SetText(L["Load AddOn"])
+		local load = CreateFrame('Button', '$parentLoad', addonListEntry[i], 'UIPanelButtonTemplate')
+		load:Size(100, 20)
+		load:Point('RIGHT', -21, 0)
+		load:SetText(L['Load AddOn'])
 		S:HandleButton(load)
 		addonListEntry[i].LoadButton = load
 
-		addonListEntry[i]:SetScript("OnEnter", AddonTooltip_Update)
-		addonListEntry[i]:SetScript("OnLeave", GameTooltip_Hide)
-
-		enabled:SetScript("OnClick", Enable_OnClick)
-		load:SetScript("OnClick", Load_OnClick)
+		addonListEntry[i]:SetScript('OnEnter', AddonTooltip_Update)
+		addonListEntry[i]:SetScript('OnLeave', GameTooltip_Hide)
+		enabled:SetScript('OnClick', Enable_OnClick)
+		load:SetScript('OnClick', Load_OnClick)
 	end
 
-	local buttonAddons = CreateFrame("Button", "ElvUI_AddonListButton", GameMenuFrame, "GameMenuButtonTemplate")
-	buttonAddons:Point("TOP", GameMenuButtonMacros, "BOTTOM", 0, -1)
-	buttonAddons:SetText(ADDONS)
+	local buttonAddons = CreateFrame('Button', 'ElvUI_AddonListButton', GameMenuFrame, 'GameMenuButtonTemplate')
+	buttonAddons:SetText('ADDONS')
 	S:HandleButton(buttonAddons)
-	buttonAddons:SetScript("OnClick", function()
+
+	buttonAddons:SetScript('OnClick', function()
 		HideUIPanel(GameMenuFrame)
 		ElvUI_AddonList:Show()
 	end)
 
-	self:HookScript(GameMenuButtonRatings, "OnShow", function(self)
-		buttonAddons:Point("TOP", self, "BOTTOM", 0, -1)
+	-- Primary Frame Hook: Bypasses Blizzard's hard-reset of heights on menu open
+	GameMenuFrame:HookScript('OnShow', function(self)
+		local _, relativeTo = GameMenuButtonLogout:GetPoint()
+
+		-- Securely re-anchor only if another addon hasn't already moved our button
+		if relativeTo ~= buttonAddons then
+			buttonAddons:Size(GameMenuButtonMacros:GetWidth(), GameMenuButtonMacros:GetHeight())
+			
+			buttonAddons:ClearAllPoints()
+			buttonAddons:Point('TOP', relativeTo, 'BOTTOM', 0, -1)
+
+			GameMenuButtonLogout:ClearAllPoints()
+			GameMenuButtonLogout:Point('TOP', buttonAddons, 'BOTTOM', 0, -26)
+		end
+
+		-- Since default WotLK resets the GameMenuFrame height continuously, we MUST scale it every time
+		local currentHeight = self:GetHeight()
+		self:SetHeight(floor(currentHeight * 1.2))
 	end)
 
-	self:HookScript(GameMenuButtonRatings, "OnHide", function(self)
-		buttonAddons:Point("TOP", GameMenuButtonMacros, "BOTTOM", 0, -1)
-	end)
-
-	GameMenuButtonLogout:SetScript("OnShow", function(self)
-		self:Point("TOP", buttonAddons, "BOTTOM", 0, -16)
-
-		if not StaticPopup_Visible("CAMP") and not StaticPopup_Visible("QUIT") then
+	-- Secondary state hook to maintain button Enable/Disable integrity
+	GameMenuButtonLogout:HookScript('OnShow', function(self)
+		if not StaticPopup_Visible('CAMP') and not StaticPopup_Visible('QUIT') then
 			self:Enable()
 		else
 			self:Disable()
 		end
 	end)
-
-	if GetLocale() == "koKR" then
-		if IsMacClient() then
-			GameMenuFrame:Height(308)
-		else
-			GameMenuFrame:Height(282)
-		end
-	else
-		if IsMacClient() then
-			GameMenuFrame:Height(292)
-		else
-			GameMenuFrame:Height(266)
-		end
-	end
 end
