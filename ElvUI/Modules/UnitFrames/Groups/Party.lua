@@ -17,6 +17,7 @@ local UnregisterStateDriver = UnregisterStateDriver
 function UF:Construct_PartyFrames()
 	self:SetScript("OnEnter", UnitFrame_OnEnter)
 	self:SetScript("OnLeave", UnitFrame_OnLeave)
+	
 
 	self.RaisedElementParent = CreateFrame("Frame", nil, self)
 	self.RaisedElementParent.TextureParent = CreateFrame("Frame", nil, self.RaisedElementParent)
@@ -44,6 +45,9 @@ function UF:Construct_PartyFrames()
 
 		self.Power = UF:Construct_PowerBar(self, true, true, "LEFT")
 		self.Power.frequentUpdates = false
+		
+		self.Energy = UF:Construct_EnergyBar(self, true, true, "LEFT")
+		self.Rage = UF:Construct_RageBar(self, true, true, "LEFT")
 
 		self.Portrait3D = UF:Construct_Portrait(self, "model")
 		self.Portrait2D = UF:Construct_Portrait(self, "texture")
@@ -162,6 +166,26 @@ function UF:Update_PartyFrames(frame, db)
 
 		frame.POWERBAR_HEIGHT = not frame.USE_POWERBAR and 0 or db.power.height
 		frame.POWERBAR_WIDTH = frame.USE_MINI_POWERBAR and (frame.UNIT_WIDTH - (frame.BORDER*2))/2 or (frame.POWERBAR_DETACHED and db.power.detachedWidth or (frame.UNIT_WIDTH - ((frame.BORDER+frame.SPACING)*2)))
+		
+				-- Energy (Nil-Guarded)
+		frame.USE_ENERGYBAR = db.energy and db.energy.enable
+		frame.ENERGYBAR_DETACHED = db.energy and db.energy.detachFromFrame
+		frame.USE_INSET_ENERGYBAR = not frame.ENERGYBAR_DETACHED and db.energy and db.energy.width == "inset" and frame.USE_ENERGYBAR
+		frame.USE_MINI_ENERGYBAR = (not frame.ENERGYBAR_DETACHED and db.energy and db.energy.width == "spaced" and frame.USE_ENERGYBAR)
+		frame.USE_ENERGYBAR_OFFSET = db.energy and db.energy.offset ~= 0 and frame.USE_ENERGYBAR and not frame.ENERGYBAR_DETACHED
+		frame.ENERGYBAR_OFFSET = frame.USE_ENERGYBAR_OFFSET and db.energy.offset or 0
+		frame.ENERGYBAR_HEIGHT = not frame.USE_ENERGYBAR and 0 or (db.energy and db.energy.height or 0)
+		frame.ENERGYBAR_WIDTH = frame.USE_MINI_ENERGYBAR and (frame.UNIT_WIDTH - (frame.BORDER*2))/2 or (frame.ENERGYBAR_DETACHED and db.energy.detachedWidth or (frame.UNIT_WIDTH - ((frame.BORDER+frame.SPACING)*2)))
+
+		-- Rage (Nil-Guarded)
+		frame.USE_RAGEBAR = db.rage and db.rage.enable
+		frame.RAGEBAR_DETACHED = db.rage and db.rage.detachFromFrame
+		frame.USE_INSET_RAGEBAR = not frame.RAGEBAR_DETACHED and db.rage and db.rage.width == "inset" and frame.USE_RAGEBAR
+		frame.USE_MINI_RAGEBAR = (not frame.RAGEBAR_DETACHED and db.rage and db.rage.width == "spaced" and frame.USE_RAGEBAR)
+		frame.USE_RAGEBAR_OFFSET = db.rage and db.rage.offset ~= 0 and frame.USE_RAGEBAR and not frame.RAGEBAR_DETACHED
+		frame.RAGEBAR_OFFSET = frame.USE_RAGEBAR_OFFSET and db.rage.offset or 0
+		frame.RAGEBAR_HEIGHT = not frame.USE_RAGEBAR and 0 or (db.rage and db.rage.height or 0)
+		frame.RAGEBAR_WIDTH = frame.USE_MINI_RAGEBAR and (frame.UNIT_WIDTH - (frame.BORDER*2))/2 or (frame.RAGEBAR_DETACHED and db.rage.detachedWidth or (frame.UNIT_WIDTH - ((frame.BORDER+frame.SPACING)*2)))
 
 		frame.USE_PORTRAIT = db.portrait and db.portrait.enable
 		frame.USE_PORTRAIT_OVERLAY = frame.USE_PORTRAIT and (db.portrait.overlay or frame.ORIENTATION == "MIDDLE")
@@ -244,6 +268,9 @@ function UF:Update_PartyFrames(frame, db)
 		UF:UpdateNameSettings(frame)
 
 		UF:Configure_Power(frame)
+		
+		UF:Configure_Energy(frame)
+		UF:Configure_Rage(frame)
 
 		UF:Configure_Portrait(frame)
 

@@ -1438,6 +1438,54 @@ P.unitframe = {
 				},
 				parent = "FRAME"
 			},
+		      energy = {
+				  enable = true,
+				  text_format = "[energycolor][energy:current]",
+				  width = "fill",
+				  height = 10,
+				  xOffset = 0,
+				  yOffset = 0,
+				  position = "LEFT",
+				  hideonnpc = false,
+				  attachTextTo = "Energy",
+				  detachFromFrame = false,
+				  detachedWidth = 250,
+				colors = {
+					enable = false,
+					color = { r = 1, g = 1, b = 1, a = 1 } -- White default
+				},
+				  strataAndLevel = {
+					useCustomStrata = false,
+					frameStrata = "LOW",
+					useCustomLevel = false,
+					frameLevel = 1
+				  },
+				  parent = "FRAME"
+		    },
+		    rage = {
+			  enable = true,
+			  text_format = "[ragecolor][rage:current]",
+			  width = "fill",
+			  height = 10,
+			  xOffset = 0,
+			  yOffset = 10,
+			  position = "LEFT",
+			  hideonnpc = false,
+			  attachTextTo = "Rage",
+			  detachFromFrame = false,
+			  detachedWidth = 250,
+			  colors = {
+					enable = false,
+					color = { r = 1, g = 1, b = 1, a = 1 } -- White default
+				},
+			  strataAndLevel = {
+				useCustomStrata = false,
+				frameStrata = "LOW",
+				useCustomLevel = false,
+				frameLevel = 1
+			  },
+			  parent = "FRAME"
+		    },
 			infoPanel = {
 				enable = false,
 				height = 20,

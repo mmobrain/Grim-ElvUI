@@ -1,9 +1,10 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [v6.22 Grimfall fork] - 2026-04-03
+
+### Feature implementation
+- **Multiple Resource Tracking:** Added simultaneous tracking for Energy and Rage on **Player** and **Party** unit frames to accurately reflect Grimfall WoW's classless mechanics.
 
 ## [v6.21] - 2026-03-18
 

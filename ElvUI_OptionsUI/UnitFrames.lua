@@ -60,10 +60,12 @@ local petAnchors = {
 }
 
 local attachToValues = {
-	["Health"] = L["HEALTH"],
-	["Power"] = L["Power"],
-	["InfoPanel"] = L["Information Panel"],
-	["Frame"] = L["Frame"]
+    ["Health"] = L["HEALTH"],
+    ["Power"]  = L["Power"],
+    ["Energy"] = L["ENERGY"] or "Energy",
+    ["Rage"]   = L["RAGE"] or "Rage",
+    ["InfoPanel"] = L["Information Panel"],
+    ["Frame"]     = L["Frame"]
 }
 
 local growthDirectionValues = {
@@ -1043,6 +1045,215 @@ local function GetOptionsTable_Power(hasDetatchOption, updateFunc, groupName, nu
 					min = 2, max = 128, step = 1
 				}
 			}
+		}
+	end
+
+	return config
+end
+
+local function EnsureCustomResourceDB(groupName, resourceKey)
+	E.db.unitframe.units[groupName] = E.db.unitframe.units[groupName] or {}
+	E.db.unitframe.units[groupName][resourceKey] = E.db.unitframe.units[groupName][resourceKey] or {}
+
+	local db = E.db.unitframe.units[groupName][resourceKey]
+
+	if db.enable == nil then db.enable = false end
+	if db.height == nil then db.height = ((E.db.unitframe.thinBorders or E.PixelMode) and 3 or 7) end
+	if db.xOffset == nil then db.xOffset = 0 end
+	if db.yOffset == nil then db.yOffset = 0 end
+	if db.position == nil or db.position == "" then db.position = "CENTER" end
+	if db.attachTextTo == nil or db.attachTextTo == "" then db.attachTextTo = "Frame" end
+	if db.text_format == nil then db.text_format = "" end
+
+	db.colors = db.colors or {}
+	if db.colors.enable == nil then db.colors.enable = false end
+
+	db.colors.color = db.colors.color or {}
+	if db.colors.color.r == nil then db.colors.color.r = 1 end
+	if db.colors.color.g == nil then db.colors.color.g = 1 end
+	if db.colors.color.b == nil then db.colors.color.b = 1 end
+	if db.colors.color.a == nil then db.colors.color.a = 1 end
+
+	db.strataAndLevel = db.strataAndLevel or {}
+	if db.strataAndLevel.useCustomStrata == nil then db.strataAndLevel.useCustomStrata = false end
+	if db.strataAndLevel.frameStrata == nil or db.strataAndLevel.frameStrata == "" then db.strataAndLevel.frameStrata = "LOW" end
+	if db.strataAndLevel.useCustomLevel == nil then db.strataAndLevel.useCustomLevel = false end
+	if db.strataAndLevel.frameLevel == nil then db.strataAndLevel.frameLevel = 1 end
+
+	return db
+end
+
+local function GetOptionsTable_CustomResource(updateFunc, groupName, resourceKey, groupLabel, order, numUnits, hasStrataLevel)
+	local config = {
+		order = order,
+		type = "group",
+		name = groupLabel,
+		get = function(info)
+			local db = EnsureCustomResourceDB(groupName, resourceKey)
+			return db[info[#info]]
+		end,
+		set = function(info, value)
+			local db = EnsureCustomResourceDB(groupName, resourceKey)
+			db[info[#info]] = value
+			updateFunc(UF, groupName, numUnits)
+		end,
+		args = {
+			header = {
+				order = 1,
+				type = "header",
+				name = groupLabel
+			},
+			enable = {
+				order = 2,
+				type = "toggle",
+				name = L["Enable"]
+			},
+			height = {
+				order = 3,
+				type = "range",
+				name = L["Height"],
+				min = ((E.db.unitframe.thinBorders or E.PixelMode) and 3 or 7),
+				max = 50,
+				step = 1
+			},
+			xOffset = {
+				order = 4,
+				type = "range",
+				name = L["X Offset"],
+				min = -100,
+				max = 100,
+				step = 1
+			},
+			yOffset = {
+				order = 5,
+				type = "range",
+				name = L["Y Offset"],
+				min = -100,
+				max = 100,
+				step = 1
+			},
+			textColor = {
+				order = 6,
+				type = "group",
+				name = L["Text Color"],
+				guiInline = true,
+				args = {
+					enable = {
+						order = 1,
+						type = "toggle",
+						name = L["Custom Color"],
+						desc = "Force a specific color for the text. Uncheck to use tags like [energycolor] or [ragecolor].",
+						width = "half",
+						get = function()
+							local db = EnsureCustomResourceDB(groupName, resourceKey)
+							return db.colors.enable
+						end,
+						set = function(info, value)
+							local db = EnsureCustomResourceDB(groupName, resourceKey)
+							db.colors.enable = value
+							updateFunc(UF, groupName, numUnits)
+						end,
+					},
+					color = {
+						order = 2,
+						type = "color",
+						name = L["Color"],
+						hasAlpha = true,
+						get = function()
+							local db = EnsureCustomResourceDB(groupName, resourceKey)
+							local t = db.colors.color
+							return t.r, t.g, t.b, t.a, 1, 1, 1, 1
+						end,
+						set = function(info, r, g, b, a)
+							local db = EnsureCustomResourceDB(groupName, resourceKey)
+							local t = db.colors.color
+							t.r, t.g, t.b, t.a = r, g, b, a
+							updateFunc(UF, groupName, numUnits)
+						end,
+						disabled = function()
+							local db = EnsureCustomResourceDB(groupName, resourceKey)
+							return not db.colors.enable
+						end,
+					},
+				},
+			},
+			configureButton = {
+				order = 7,
+				type = "execute",
+				name = L["Coloring"],
+				desc = L["This opens the UnitFrames Color settings."],
+				func = function()
+					ACD:SelectGroup("ElvUI", "unitframe", "general", "allColorsGroup", "powerGroup")
+				end,
+			},
+			position = {
+				order = 8,
+				type = "select",
+				name = L["Text Position"],
+				values = attachToValues
+			},
+			attachTextTo = {
+				order = 9,
+				type = "select",
+				name = L["Attach Text To"],
+				values = attachToValues
+			},
+			text_format = {
+				order = 100,
+				type = "input",
+				name = L["Text Format"],
+				width = "full",
+				desc = L["TEXT_FORMAT_DESC"]
+			},
+		},
+	}
+
+	if hasStrataLevel then
+		config.args.strataAndLevel = {
+			order = 101,
+			type = "group",
+			name = L["Strata and Level"],
+			guiInline = true,
+			get = function(info)
+				local db = EnsureCustomResourceDB(groupName, resourceKey)
+				return db.strataAndLevel[info[#info]]
+			end,
+			set = function(info, value)
+				local db = EnsureCustomResourceDB(groupName, resourceKey)
+				db.strataAndLevel[info[#info]] = value
+				updateFunc(UF, groupName, numUnits)
+			end,
+			args = {
+				useCustomStrata = {
+					order = 1,
+					type = "toggle",
+					name = L["Use Custom Strata"]
+				},
+				frameStrata = {
+					order = 2,
+					type = "select",
+					name = L["Frame Strata"],
+					values = {
+						["BACKGROUND"] = "BACKGROUND",
+						["LOW"] = "LOW",
+						["MEDIUM"] = "MEDIUM",
+						["HIGH"] = "HIGH",
+					},
+				},
+				useCustomLevel = {
+					order = 3,
+					type = "toggle",
+					name = L["Use Custom Level"]
+				},
+				frameLevel = {
+					order = 4,
+					type = "range",
+					name = L["Frame Level"],
+					min = 1,
+					max = 128,
+					step = 1
+				},
+			},
 		}
 	end
 
@@ -3751,6 +3962,129 @@ E.Options.args.unitframe.args.player = {
 		health = GetOptionsTable_Health(false, UF.CreateAndUpdateUF, "player"),
 		infoPanel = GetOptionsTable_InformationPanel(UF.CreateAndUpdateUF, "player"),
 		power = GetOptionsTable_Power(true, UF.CreateAndUpdateUF, "player", nil, true),
+				energy = {
+			order = 210, type = "group", name = L["Energy"],
+			get = function(info) return E.db.unitframe.units.player.energy[info[#info]] end,
+			set = function(info, value) E.db.unitframe.units.player.energy[info[#info]] = value UF:CreateAndUpdateUF("player") end,
+			args = {
+				header = { order = 1, type = "header", name = L["Energy"] },
+				enable = { order = 2, type = "toggle", name = L["Enable"] },
+				height = { order = 3, type = "range", name = L["Height"], min = ((E.db.unitframe.thinBorders or E.PixelMode) and 3 or 7), max = 50, step = 1 },
+				xOffset = { order = 4, type = "range", name = L["X Offset"], min = -100, max = 100, step = 1 },
+				yOffset = { order = 5, type = "range", name = L["Y Offset"], min = -100, max = 100, step = 1 },
+				
+				-- FIXED: Text Color Options with correct `get` functions
+				textColor = {
+					order = 6, type = "group", name = L["Text Color"], guiInline = true,
+					args = {
+						enable = {
+							order = 1, type = "toggle", name = L["Custom Color"],
+							desc = "Force a specific color for the text. Uncheck to use tags like [energycolor].",
+							width = "half",
+							get = function(info) return E.db.unitframe.units.player.energy.colors.enable end,  -- ADDED: This fixes the checkbox
+							set = function(info, value)
+								E.db.unitframe.units.player.energy.colors.enable = value
+								UF:CreateAndUpdateUF("player")
+							end
+						},
+						color = {
+							order = 2, type = "color", name = L["Color"], hasAlpha = true,
+							get = function(info)
+								local t = E.db.unitframe.units.player.energy.colors.color
+								return t.r, t.g, t.b, t.a, 1, 1, 1, 1
+							end,
+							set = function(info, r, g, b, a)
+								local t = E.db.unitframe.units.player.energy.colors.color
+								t.r, t.g, t.b, t.a = r, g, b, a
+								UF:CreateAndUpdateUF("player")
+							end,
+							disabled = function() return not E.db.unitframe.units.player.energy.colors.enable end
+						}
+					}
+				},
+
+				configureButton = {
+					order = 7, type = "execute", name = L["Coloring"], desc = L["This opens the UnitFrames Color settings."],
+					func = function() ACD:SelectGroup("ElvUI", "unitframe", "general", "allColorsGroup", "powerGroup") end,
+				},
+				position = { order = 8, type = "select", name = L["Text Position"], values = positionValues },
+				attachTextTo = { order = 9, type = "select", name = L["Attach Text To"], values = attachToValues },
+				text_format = { order = 100, type = "input", name = L["Text Format"], width = "full", desc = L["TEXT_FORMAT_DESC"] },
+                strataAndLevel = {
+                    order = 101, type = "group", name = L["Strata and Level"], guiInline = true,
+                    get = function(info) return E.db.unitframe.units.player.energy.strataAndLevel[info[#info]] end,
+                    set = function(info, value) E.db.unitframe.units.player.energy.strataAndLevel[info[#info]] = value; UF:CreateAndUpdateUF("player") end,
+                    args = {
+                        useCustomStrata = { order = 1, type = "toggle", name = L["Use Custom Strata"] },
+                        frameStrata = { order = 2, type = "select", name = L["Frame Strata"], values = { ["BACKGROUND"]="BACKGROUND", ["LOW"]="LOW", ["MEDIUM"]="MEDIUM", ["HIGH"]="HIGH" } },
+                        useCustomLevel = { order = 3, type = "toggle", name = L["Use Custom Level"] },
+                        frameLevel = { order = 4, type = "range", name = L["Frame Level"], min = 1, max = 128, step = 1 }
+                    }
+                }
+            }
+        },
+        				rage = {
+			order = 220, type = "group", name = L["RAGE"],
+			get = function(info) return E.db.unitframe.units.player.rage[info[#info]] end,
+			set = function(info, value) E.db.unitframe.units.player.rage[info[#info]] = value UF:CreateAndUpdateUF("player") end,
+			args = {
+				header = { order = 1, type = "header", name = L["RAGE"] },
+				enable = { order = 2, type = "toggle", name = L["Enable"] },
+				height = { order = 3, type = "range", name = L["Height"], min = ((E.db.unitframe.thinBorders or E.PixelMode) and 3 or 7), max = 50, step = 1 },
+				xOffset = { order = 4, type = "range", name = L["X Offset"], min = -100, max = 100, step = 1 },
+				yOffset = { order = 5, type = "range", name = L["Y Offset"], min = -100, max = 100, step = 1 },
+				
+				-- FIXED: Text Color Options
+				textColor = {
+					order = 6, type = "group", name = L["Text Color"], guiInline = true,
+					args = {
+						enable = {
+							order = 1, type = "toggle", name = L["Custom Color"],
+							desc = "Force a specific color for the text. Uncheck to use tags like [ragecolor].",
+							width = "half",
+							get = function(info) return E.db.unitframe.units.player.rage.colors.enable end,  -- ADDED: Fixes checkbox
+							set = function(info, value)
+								E.db.unitframe.units.player.rage.colors.enable = value
+								UF:CreateAndUpdateUF("player")
+							end
+						},
+						color = {
+							order = 2, type = "color", name = L["Color"], hasAlpha = true,
+							get = function(info)
+								local t = E.db.unitframe.units.player.rage.colors.color
+								return t.r, t.g, t.b, t.a, 1, 1, 1, 1
+							end,
+							set = function(info, r, g, b, a)
+								local t = E.db.unitframe.units.player.rage.colors.color
+								t.r, t.g, t.b, t.a = r, g, b, a
+								UF:CreateAndUpdateUF("player")
+							end,
+							disabled = function() return not E.db.unitframe.units.player.rage.colors.enable end
+						}
+					}
+				},
+
+				configureButton = {
+					order = 7, type = "execute", name = L["Coloring"], desc = L["This opens the UnitFrames Color settings."],
+					func = function() ACD:SelectGroup("ElvUI", "unitframe", "general", "allColorsGroup", "powerGroup") end,
+				},
+				position = { order = 8, type = "select", name = L["Text Position"], values = positionValues },
+				attachTextTo = { order = 9, type = "select", name = L["Attach Text To"], values = attachToValues },
+				text_format = { order = 100, type = "input", name = L["Text Format"], width = "full", desc = L["TEXT_FORMAT_DESC"] },
+
+                strataAndLevel = {
+                    order = 101, type = "group", name = L["Strata and Level"], guiInline = true,
+                    get = function(info) return E.db.unitframe.units.player.rage.strataAndLevel[info[#info]] end,
+                    set = function(info, value) E.db.unitframe.units.player.rage.strataAndLevel[info[#info]] = value; UF:CreateAndUpdateUF("player") end,
+                    args = {
+                        useCustomStrata = { order = 1, type = "toggle", name = L["Use Custom Strata"] },
+                        frameStrata = { order = 2, type = "select", name = L["Frame Strata"], values = { ["BACKGROUND"]="BACKGROUND", ["LOW"]="LOW", ["MEDIUM"]="MEDIUM", ["HIGH"]="HIGH" } },
+                        useCustomLevel = { order = 3, type = "toggle", name = L["Use Custom Level"] },
+                        frameLevel = { order = 4, type = "range", name = L["Frame Level"], min = 1, max = 128, step = 1 }
+                    }
+                }
+            }
+        },
 		name = GetOptionsTable_Name(UF.CreateAndUpdateUF, "player"),
 		portrait = GetOptionsTable_Portrait(UF.CreateAndUpdateUF, "player"),
 		fader = GetOptionsTable_Fader(UF.CreateAndUpdateUF, "player"),
@@ -4374,7 +4708,7 @@ E.Options.args.unitframe.args.target = {
 		customText = GetOptionsTable_CustomText(UF.CreateAndUpdateUF, "target"),
 		health = GetOptionsTable_Health(false, UF.CreateAndUpdateUF, "target"),
 		infoPanel = GetOptionsTable_InformationPanel(UF.CreateAndUpdateUF, "target"),
-		power = GetOptionsTable_Power(true, UF.CreateAndUpdateUF, "target", nil, true),
+		power = GetOptionsTable_Power(true, UF.CreateAndUpdateUF, "target", nil, true),		
 		name = GetOptionsTable_Name(UF.CreateAndUpdateUF, "target"),
 		portrait = GetOptionsTable_Portrait(UF.CreateAndUpdateUF, "target"),
 		fader = GetOptionsTable_Fader(UF.CreateAndUpdateUF, "target"),
@@ -6144,6 +6478,8 @@ E.Options.args.unitframe.args.party = {
 		health = GetOptionsTable_Health(true, UF.CreateAndUpdateHeaderGroup, "party"),
 		healPredction = GetOptionsTable_HealPrediction(UF.CreateAndUpdateHeaderGroup, "party"),
 		power = GetOptionsTable_Power(false, UF.CreateAndUpdateHeaderGroup, "party"),
+		energy = GetOptionsTable_CustomResource(UF.CreateAndUpdateHeaderGroup, "party", "energy", L["Energy"], 210, nil, true),
+		rage = GetOptionsTable_CustomResource(UF.CreateAndUpdateHeaderGroup, "party", "rage", L["Rage"], 211, nil, true),
 		infoPanel = GetOptionsTable_InformationPanel(UF.CreateAndUpdateHeaderGroup, "party"),
 		name = GetOptionsTable_Name(UF.CreateAndUpdateHeaderGroup, "party"),
 		portrait = GetOptionsTable_Portrait(UF.CreateAndUpdateHeaderGroup, "party"),

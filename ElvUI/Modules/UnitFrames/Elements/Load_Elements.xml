@@ -29,5 +29,7 @@
 	<Script file="ResurrectionIcon.lua"/>
 	<Script file="RoleIcons.lua"/>
 	<Script file="Threat.lua"/>
-	<Script file="Trinket.lua"/>
+	<Script file="Trinket.lua"/>	
+	<Script file="PowerEnergy.lua"/>
+	<Script file="PowerRage.lua"/>
 </Ui>

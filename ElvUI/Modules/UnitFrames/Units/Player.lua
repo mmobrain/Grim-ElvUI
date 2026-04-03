@@ -12,7 +12,7 @@ local CreateFrame = CreateFrame
 local CastingBarFrame_OnLoad = CastingBarFrame_OnLoad
 local CastingBarFrame_SetUnit = CastingBarFrame_SetUnit
 
-local CAN_HAVE_CLASSBAR = (E.myclass == "DRUID" or E.myclass == "DEATHKNIGHT")
+local CAN_HAVE_CLASSBAR = (E.myclass == "DRUID" or E.myclass == "DEATHKNIGHT" or E.myclass == "HERO")
 
 function UF:Construct_PlayerFrame(frame)
 	frame.ThreatIndicator = self:Construct_Threat(frame)
@@ -20,6 +20,11 @@ function UF:Construct_PlayerFrame(frame)
 	frame.Health.frequentUpdates = true
 	frame.Power = self:Construct_PowerBar(frame, true, true, "LEFT")
 	frame.Power.frequentUpdates = true
+	
+	-- Added Energy and Rage Bars for Heroes
+	frame.Energy = self:Construct_EnergyBar(frame, true, true, "LEFT")
+	frame.Rage = self:Construct_RageBar(frame, true, true, "LEFT")
+	
 	frame.Name = self:Construct_NameText(frame)
 	frame.Portrait3D = self:Construct_Portrait(frame, "model")
 	frame.Portrait2D = self:Construct_Portrait(frame, "texture")
@@ -27,8 +32,7 @@ function UF:Construct_PlayerFrame(frame)
 	frame.Debuffs = self:Construct_Debuffs(frame)
 	frame.Castbar = self:Construct_Castbar(frame, L["Player Castbar"])
 
-	--Create a holder frame all "classbars" can be positioned into
-	if CAN_HAVE_CLASSBAR then
+	if E.myclass == "DEATHKNIGHT" or E.myclass == "DRUID" or E.myclass == "HERO" then
 		frame.ClassBarHolder = CreateFrame("Frame", nil, frame)
 		frame.ClassBarHolder:Point("BOTTOM", E.UIParent, "BOTTOM", 0, 150)
 
@@ -38,6 +42,9 @@ function UF:Construct_PlayerFrame(frame)
 		elseif E.myclass == "DRUID" then
 			frame.AdditionalPower = self:Construct_AdditionalPowerBar(frame, nil, UF.UpdateClassBar)
 			frame.ClassBar = "AdditionalPower"
+		elseif E.myclass == "HERO" then
+			-- Classless heroes don't have a native class resource, but we keep this block
+			-- for consistency. You can disable classbar in config if needed.
 		end
 	end
 
@@ -57,7 +64,7 @@ function UF:Construct_PlayerFrame(frame)
 	frame.Cutaway = self:Construct_Cutaway(frame)
 	frame.customTexts = {}
 
-	frame:Point("BOTTOMLEFT", E.UIParent, "BOTTOM", -413, 68) --Set to default position
+	frame:Point("BOTTOMLEFT", E.UIParent, "BOTTOM", -413, 68)
 	E:CreateMover(frame, frame:GetName().."Mover", L["Player Frame"], nil, nil, nil, "ALL,SOLO", nil, "unitframe,player,generalGroup")
 
 	frame.unitframeType = "player"
@@ -67,41 +74,58 @@ function UF:Update_PlayerFrame(frame, db)
 	frame.db = db
 
 	do
-		frame.ORIENTATION = db.orientation --allow this value to change when unitframes position changes on screen?
+		frame.ORIENTATION = db.orientation
 
 		frame.UNIT_WIDTH = db.width
 		frame.UNIT_HEIGHT = db.infoPanel.enable and (db.height + db.infoPanel.height) or db.height
 
+		-- Mana / Power
 		frame.USE_POWERBAR = db.power.enable
 		frame.POWERBAR_DETACHED = db.power.detachFromFrame
 		frame.USE_INSET_POWERBAR = not frame.POWERBAR_DETACHED and db.power.width == "inset" and frame.USE_POWERBAR
 		frame.USE_MINI_POWERBAR = (not frame.POWERBAR_DETACHED and db.power.width == "spaced" and frame.USE_POWERBAR)
 		frame.USE_POWERBAR_OFFSET = db.power.offset ~= 0 and frame.USE_POWERBAR and not frame.POWERBAR_DETACHED
 		frame.POWERBAR_OFFSET = frame.USE_POWERBAR_OFFSET and db.power.offset or 0
-
 		frame.POWERBAR_HEIGHT = not frame.USE_POWERBAR and 0 or db.power.height
 		frame.POWERBAR_WIDTH = frame.USE_MINI_POWERBAR and (frame.UNIT_WIDTH - (frame.BORDER*2))/2 or (frame.POWERBAR_DETACHED and db.power.detachedWidth or (frame.UNIT_WIDTH - ((frame.BORDER+frame.SPACING)*2)))
+
+		-- Energy
+		frame.USE_ENERGYBAR = db.energy.enable
+		frame.ENERGYBAR_DETACHED = db.energy.detachFromFrame
+		frame.USE_INSET_ENERGYBAR = not frame.ENERGYBAR_DETACHED and db.energy.width == "inset" and frame.USE_ENERGYBAR
+		frame.USE_MINI_ENERGYBAR = (not frame.ENERGYBAR_DETACHED and db.energy.width == "spaced" and frame.USE_ENERGYBAR)
+		frame.USE_ENERGYBAR_OFFSET = db.energy.offset ~= 0 and frame.USE_ENERGYBAR and not frame.ENERGYBAR_DETACHED
+		frame.ENERGYBAR_OFFSET = frame.USE_ENERGYBAR_OFFSET and db.energy.offset or 0
+		frame.ENERGYBAR_HEIGHT = not frame.USE_ENERGYBAR and 0 or db.energy.height
+		frame.ENERGYBAR_WIDTH = frame.USE_MINI_ENERGYBAR and (frame.UNIT_WIDTH - (frame.BORDER*2))/2 or (frame.ENERGYBAR_DETACHED and db.energy.detachedWidth or (frame.UNIT_WIDTH - ((frame.BORDER+frame.SPACING)*2)))
+
+		-- Rage
+		frame.USE_RAGEBAR = db.rage.enable
+		frame.RAGEBAR_DETACHED = db.rage.detachFromFrame
+		frame.USE_INSET_RAGEBAR = not frame.RAGEBAR_DETACHED and db.rage.width == "inset" and frame.USE_RAGEBAR
+		frame.USE_MINI_RAGEBAR = (not frame.RAGEBAR_DETACHED and db.rage.width == "spaced" and frame.USE_RAGEBAR)
+		frame.USE_RAGEBAR_OFFSET = db.rage.offset ~= 0 and frame.USE_RAGEBAR and not frame.RAGEBAR_DETACHED
+		frame.RAGEBAR_OFFSET = frame.USE_RAGEBAR_OFFSET and db.rage.offset or 0
+		frame.RAGEBAR_HEIGHT = not frame.USE_RAGEBAR and 0 or db.rage.height
+		frame.RAGEBAR_WIDTH = frame.USE_MINI_RAGEBAR and (frame.UNIT_WIDTH - (frame.BORDER*2))/2 or (frame.RAGEBAR_DETACHED and db.rage.detachedWidth or (frame.UNIT_WIDTH - ((frame.BORDER+frame.SPACING)*2)))
 
 		frame.USE_PORTRAIT = db.portrait and db.portrait.enable
 		frame.USE_PORTRAIT_OVERLAY = frame.USE_PORTRAIT and (db.portrait.overlay or frame.ORIENTATION == "MIDDLE")
 		frame.PORTRAIT_WIDTH = (frame.USE_PORTRAIT_OVERLAY or not frame.USE_PORTRAIT) and 0 or db.portrait.width
 
-		frame.CAN_HAVE_CLASSBAR = CAN_HAVE_CLASSBAR
 		frame.MAX_CLASS_BAR = frame.MAX_CLASS_BAR or UF.classMaxResourceBar[E.myclass] or 0
-		frame.USE_CLASSBAR = db.classbar.enable and frame.CAN_HAVE_CLASSBAR
-		frame.CLASSBAR_SHOWN = frame.CAN_HAVE_CLASSBAR and frame[frame.ClassBar]:IsShown()
+		frame.USE_CLASSBAR = db.classbar.enable
+		frame.CLASSBAR_SHOWN = frame[frame.ClassBar]:IsShown()
 		frame.CLASSBAR_DETACHED = db.classbar.detachFromFrame
 		frame.USE_MINI_CLASSBAR = db.classbar.fill == "spaced" and frame.USE_CLASSBAR
 		frame.CLASSBAR_HEIGHT = frame.USE_CLASSBAR and db.classbar.height or 0
 		frame.CLASSBAR_WIDTH = frame.UNIT_WIDTH - ((frame.BORDER+frame.SPACING)*2) - frame.PORTRAIT_WIDTH -(frame.ORIENTATION == "MIDDLE" and (frame.POWERBAR_OFFSET*2) or frame.POWERBAR_OFFSET)
-		--If formula for frame.CLASSBAR_YOFFSET changes, then remember to update it in classbars.lua too
 		frame.CLASSBAR_YOFFSET = (not frame.USE_CLASSBAR or not frame.CLASSBAR_SHOWN or frame.CLASSBAR_DETACHED) and 0 or (frame.USE_MINI_CLASSBAR and (frame.SPACING+(frame.CLASSBAR_HEIGHT/2)) or (frame.CLASSBAR_HEIGHT - (frame.BORDER-frame.SPACING)))
 
-		frame.USE_INFO_PANEL = not frame.USE_MINI_POWERBAR and not frame.USE_POWERBAR_OFFSET and db.infoPanel.enable
+		frame.USE_INFO_PANEL = not frame.USE_MINI_POWERBAR and not frame.USE_POWERBAR_OFFSET and not frame.USE_MINI_RAGEBAR and not frame.USE_RAGEBAR_OFFSET and not frame.USE_MINI_ENERGYBAR and not frame.USE_ENERGYBAR_OFFSET and db.infoPanel.enable
 		frame.INFO_PANEL_HEIGHT = frame.USE_INFO_PANEL and db.infoPanel.height or 0
 
 		frame.BOTTOM_OFFSET = UF:GetHealthBottomOffset(frame)
-
 		frame.VARIABLES_SET = true
 	end
 
@@ -112,40 +136,24 @@ function UF:Update_PlayerFrame(frame, db)
 	_G[frame:GetName().."Mover"]:Size(frame:GetSize())
 
 	UF:Configure_InfoPanel(frame)
-
-	--Threat
 	UF:Configure_Threat(frame)
-
-	--Rest Icon
 	UF:Configure_RestingIndicator(frame)
-
-	--Combat Icon
 	UF:Configure_CombatIndicator(frame)
-
-	--Resource Bars
 	UF:Configure_ClassBar(frame)
-
-	--Health
-	UF:Configure_HealthBar(frame)
-
-	--Name
-	UF:UpdateNameSettings(frame)
-
-	--PvP
-	UF:Configure_PVPIndicator(frame)
-
-	--Power
+	
+    -- Correct Order for Stacking: Power -> Energy -> Rage
 	UF:Configure_Power(frame)
-
-	--Portrait
+	UF:Configure_Energy(frame)
+	UF:Configure_Rage(frame)
+    
+	UF:Configure_HealthBar(frame)
+	UF:UpdateNameSettings(frame)
+	UF:Configure_PVPIndicator(frame)
 	UF:Configure_Portrait(frame)
-
-	--Auras
 	UF:EnableDisable_Auras(frame)
 	UF:Configure_Auras(frame, "Buffs")
 	UF:Configure_Auras(frame, "Debuffs")
-
-	--Castbar
+	
 	frame:DisableElement("Castbar")
 	UF:Configure_Castbar(frame)
 
@@ -159,35 +167,19 @@ function UF:Update_PlayerFrame(frame, db)
 		CastingBarFrame_SetUnit(PetCastingBarFrame, nil)
 	end
 
-	--Fader
 	UF:Configure_Fader(frame)
-
-	--Cutaway
 	UF:Configure_Cutaway(frame)
-
-	--Debuff Highlight
 	UF:Configure_DebuffHighlight(frame)
-
-	--Raid Icon
 	UF:Configure_RaidIcon(frame)
-
-	--OverHealing
 	UF:Configure_HealComm(frame)
-
-	--AuraBars
 	UF:Configure_AuraBars(frame)
-	--We need to update Target AuraBars if attached to Player AuraBars
-	--mainly because of issues when using power offset on player and switching to/from middle orientation
+	
 	if E.db.unitframe.units.target.aurabar.attachTo == "PLAYER_AURABARS" and ElvUF_Target then
 		UF:Configure_AuraBars(ElvUF_Target)
 	end
 
-	--PvP
 	UF:Configure_PVPIcon(frame)
-
 	UF:Configure_RaidRoleIcons(frame)
-
-	--CustomTexts
 	UF:Configure_CustomTexts(frame)
 
 	E:SetMoverSnapOffset(frame:GetName().."Mover", -(12 + db.castbar.height))

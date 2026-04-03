@@ -1,60 +1,23 @@
-<div align="center">
+This repository contains the ElvUI compatibility modification tailored for **Grimfall WoW**.
 
-# Project Ebonhold ElvUI Pack
+It is based on Qt (RosemyneH) and Xurkon's modification of Ascension 3.3.5a ElvUI, which includes numerous fixes and backwards compatibility for Project Ebonhold. For upstream details, check [Xurkon's repository](https://github.com/Xurkon/PE-ElvUI).
 
-![Version](https://img.shields.io/badge/version-v6.21-blue.svg?style=for-the-badge)
-![Downloads](https://img.shields.io/github/downloads/Xurkon/PE-ElvUI/total?style=for-the-badge&color=e67e22)
-[![Documentation](https://img.shields.io/badge/Documentation-View%20Docs-58a6ff?style=for-the-badge)](https://xurkon.github.io/PE-ElvUI/)
-[![Patreon](https://img.shields.io/badge/Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white)](https://www.patreon.com/Xurkon)
-[![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.me/Xurkon)
-![Platform](https://img.shields.io/badge/PLATFORM-PROJECT%20EBONHOLD-blue?style=for-the-badge&logo=windows&logoColor=white)
+## Key Features & Changes
 
-<br/>
-**Curated ElvUI + Modules collection for Project Ascension 3.3.5a**
-<br/>
-[⬇ **Download Latest**](https://github.com/Xurkon/PE-ElvUI/releases/latest) &nbsp;&nbsp;•&nbsp;&nbsp; [📂 **View Source**](https://github.com/Xurkon/PE-ElvUI)
-
-</div>
-
----
+*   **Multiple Resource Tracking:** Added simultaneous tracking for Energy and Rage on **Player** and **Party** unit frames to accurately reflect Grimfall WoW's classless mechanics.
 
 
-
-This repository contains the curated ElvUI + Modules collection for **Project Ebonhold** (Ascension 3.3.5a), patched with critical stability fixes.
-
-## Critical Fixes Included
-
-### 1. Minimap Freeze Resolution
-**Issue**: `ElvUI_Enhanced` (Minimap Button Grabber) and `MinimapButtonFrame` (MBF) would continuously fight for control over minimap buttons, causing an infinite loop that froze the game client on reload.
-**Fix**: `ElvUI_Enhanced` now proactively detects if `MinimapButtonFrame` is loaded during initialization. If detected, the Button Grabber module automatically **disables itself**, yielding full control to MBF. This eliminates the conflict and prevents the freeze.
-
-### 2. SwingBar Recursion Check
-**Issue**: `ElvUI_SwingBar` could enter a recursive loop during `PLAYER_ENTERING_WORLD` due to unsafe event handling.
-**Fix**: Added guards to initialization logic to prevent re-entrant calls.
-
-### 3. Ebonhold Skin Recursion Check
-**Issue**: The Ebonhold skin initialization logic contained an unsafe polling loop and lacked recursion guards on the `SetScale` hook. This caused it to fight with other addons attempting to control the frame scale, resulting in an infinite loop freeze.
-**Fix**:
-- Replaced polling timer with `PLAYER_ENTERING_WORLD` event.
-- Added recursion guard to `SetScale` hook.
-- Implemented "Anti-Fight Logic" to yield execution if conflict is detected.
-
-### 4. Version Check Popup Disabled
-**Issue**: ElvUI would display a "ElvUI was updated while the game is still running" popup if the version check logic triggered, even if no update had occurred (common with manual installations).
-**Fix**: Disabled the version check logic entirely to prevent false positives and unnecessary popups.
-
-### 5. Shaman Totem Bar Resize Bug
-**Issue**: Upon learning a new Totem and unlocking a new slot, the Shaman MultiCastActionBar would break, causing the newly spawned totem icon to stretch to infinite viewport limits.
-**Fix**: ElvUI's Shaman action bar code (`AB:CreateTotemBar()`) was injecting style configurations onto natively active totems but completely failed to hook WotLK's `MultiCastActionBar_Update` logic required to process dynamically spawning elements mid-session. Bound `PositionAndSizeBarTotem` to `MultiCastActionBar_Update` forcing the UI to process structural bounds on dynamically incrementing slots.
+> **Configuration Required:** You must manually enable and configure the "Energy" and "Rage" bars within the ElvUI Options menu (`/ec` -> UnitFrames -> Player / Party).
 
 ## Installation
-1. Download the latest `zip` from the [Releases](https://github.com/Xurkon/PE-ElvUI/releases) page.
-2. Extract the contents to your `WoW\Interface\AddOns` folder.
-3. **Important:** Ensure the folder is named `ElvUI`. The folder name **must match** the `.toc` file (which is `ElvUI.toc`) for the game to recognize it. If the extracted folder is named differently (e.g., `ElvUI-master` or `PE-ElvUI`), you **must** rename it to `ElvUI`.
-4. **Restart WoW**: You must completely restart the World of Warcraft client for the new addons to load. A simple UI reload (`/reload`) is **not sufficient** for newly installed addons.
+
+1. Download the latest `.zip` archive from the [Releases](https://github.com/mmobrain/Grim-ElvUI/releases) page.
+2. Extract the contents into your `World of Warcraft\Interface\AddOns` folder.
+3. **Restart WoW:** You must completely restart the World of Warcraft client for the new addons to hook into the engine. A simple UI reload (`/reload`) is **not sufficient** for newly installed directories.
 
 ## Credits
 
 - **[Qt (RosemyneH)](https://github.com/RosemyneH/ElvUI_Ebonhold)** - Initial compatibility fixes for Ebonhold.
-- **Xurkon** - Stability fixes, Freeze Resolutions, and Pack Maintenance.
- 
+- **Xurkon** - Stability fixes, freeze resolutions, and pack maintenance.
+- **Ascension WoW** - Base `PowerEnergy.lua` and `PowerRage.lua` scripts.
+- **Skulltrail** - Modified (this) version featuring Grimfall WoW compatibility, multi-resource tracking, and UI engine fixes.
