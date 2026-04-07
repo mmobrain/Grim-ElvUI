@@ -46,8 +46,10 @@ function UF:Construct_PartyFrames()
 		self.Power = UF:Construct_PowerBar(self, true, true, "LEFT")
 		self.Power.frequentUpdates = false
 		
-		self.Energy = UF:Construct_EnergyBar(self, true, true, "LEFT")
-		self.Rage = UF:Construct_RageBar(self, true, true, "LEFT")
+		self.Energy = UF:Construct_EnergyBar(self, true, true, 'LEFT')
+		self.Rage = UF:Construct_RageBar(self, true, true, 'LEFT')
+		self.Mana = UF:Construct_ManaBar(self, true, true, 'LEFT')
+		self.Runic = UF:Construct_RunicBar(self, true, true, 'LEFT')
 
 		self.Portrait3D = UF:Construct_Portrait(self, "model")
 		self.Portrait2D = UF:Construct_Portrait(self, "texture")
@@ -186,6 +188,22 @@ function UF:Update_PartyFrames(frame, db)
 		frame.RAGEBAR_OFFSET = frame.USE_RAGEBAR_OFFSET and db.rage.offset or 0
 		frame.RAGEBAR_HEIGHT = not frame.USE_RAGEBAR and 0 or (db.rage and db.rage.height or 0)
 		frame.RAGEBAR_WIDTH = frame.USE_MINI_RAGEBAR and (frame.UNIT_WIDTH - (frame.BORDER*2))/2 or (frame.RAGEBAR_DETACHED and db.rage.detachedWidth or (frame.UNIT_WIDTH - ((frame.BORDER+frame.SPACING)*2)))
+		
+		frame.USE_MANABAR = db.mana and db.mana.enable
+		frame.MANABAR_DETACHED = db.mana and db.mana.detachFromFrame
+		frame.USE_INSET_MANABAR = not frame.MANABAR_DETACHED and db.mana and db.mana.width == 'inset' and frame.USE_MANABAR
+		frame.USE_MINI_MANABAR = not frame.MANABAR_DETACHED and db.mana and db.mana.width == 'spaced' and frame.USE_MANABAR
+		frame.USE_MANABAR_OFFSET = db.mana and db.mana.offset ~= 0 and frame.USE_MANABAR and not frame.MANABAR_DETACHED
+		frame.MANABAR_OFFSET = frame.USE_MANABAR_OFFSET and db.mana.offset or 0
+		frame.MANABAR_HEIGHT = not frame.USE_MANABAR and 0 or (db.mana and db.mana.height) or 0
+
+		frame.USE_RUNICBAR = db.runic and db.runic.enable
+		frame.RUNICBAR_DETACHED = db.runic and db.runic.detachFromFrame
+		frame.USE_INSET_RUNICBAR = not frame.RUNICBAR_DETACHED and db.runic and db.runic.width == 'inset' and frame.USE_RUNICBAR
+		frame.USE_MINI_RUNICBAR = not frame.RUNICBAR_DETACHED and db.runic and db.runic.width == 'spaced' and frame.USE_RUNICBAR
+		frame.USE_RUNICBAR_OFFSET = db.runic and db.runic.offset ~= 0 and frame.USE_RUNICBAR and not frame.RUNICBAR_DETACHED
+		frame.RUNICBAR_OFFSET = frame.USE_RUNICBAR_OFFSET and db.runic.offset or 0
+		frame.RUNICBAR_HEIGHT = not frame.USE_RUNICBAR and 0 or (db.runic and db.runic.height) or 0
 
 		frame.USE_PORTRAIT = db.portrait and db.portrait.enable
 		frame.USE_PORTRAIT_OVERLAY = frame.USE_PORTRAIT and (db.portrait.overlay or frame.ORIENTATION == "MIDDLE")
@@ -271,6 +289,8 @@ function UF:Update_PartyFrames(frame, db)
 		
 		UF:Configure_Energy(frame)
 		UF:Configure_Rage(frame)
+		UF:Configure_Mana(frame)
+		UF:Configure_Runic(frame)
 
 		UF:Configure_Portrait(frame)
 

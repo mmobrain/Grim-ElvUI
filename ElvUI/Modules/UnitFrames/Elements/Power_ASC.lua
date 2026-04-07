@@ -10,47 +10,6 @@ local _, ns = ...
 local ElvUF = ns.oUF
 assert(ElvUF, "ElvUI was unable to locate oUF.")
 
-local UnitPowerType = UnitPowerType
-
-local function IsDuplicateTrackedPower(frame, unit)
-	if not frame or frame.unit ~= "player" then return false end
-	if not unit or unit ~= frame.unit then return false end
-
-	local powerType = UnitPowerType(unit)
-
-	if powerType == 3 and frame.USE_ENERGYBAR and frame.Energy and frame.Energy:IsShown() then
-		return true
-	end
-
-	if powerType == 1 and frame.USE_RAGEBAR and frame.Rage and frame.Rage:IsShown() then
-		return true
-	end
-
-	return false
-end
-
-local function SetDuplicatePowerAlpha(power, hidden)
-	local alpha = hidden and 0 or 1
-
-	power:SetAlpha(alpha)
-
-	if power.BG then
-		power.BG:SetAlpha(alpha)
-	end
-
-	if power.backdrop then
-		power.backdrop:SetAlpha(alpha)
-	end
-
-	if power.value then
-		power.value:SetAlpha(alpha)
-	end
-
-	if power.ClipFrame then
-		power.ClipFrame:SetAlpha(alpha)
-	end
-end
-
 function UF:Construct_PowerBar(frame, bg, text, textPos)
 	local power = CreateFrame("StatusBar", nil, frame)
 	UF.statusbars[power] = true
@@ -178,39 +137,139 @@ function UF:Configure_Power(frame)
 			power:SetFrameLevel(50) --RaisedElementParent uses 100, we want lower value to allow certain icons and texts to appear above power
 		elseif frame.USE_POWERBAR_OFFSET then
 			if frame.ORIENTATION == "LEFT" then
-				power:Point("TOPRIGHT", frame.Health, "TOPRIGHT", frame.POWERBAR_OFFSET + (frame.HAPPINESS_WIDTH or 0), -frame.POWERBAR_OFFSET)
-				power:Point("BOTTOMLEFT", frame.Health, "BOTTOMLEFT", frame.POWERBAR_OFFSET, -frame.POWERBAR_OFFSET)
+				power:Point("TOPRIGHT", frame.Health, "TOPRIGHT",
+					frame.POWERBAR_OFFSET + (frame.HAPPINESS_WIDTH or 0),
+					-frame.POWERBAR_OFFSET
+				)
+				power:Point("BOTTOMLEFT", frame.Health, "BOTTOMLEFT",
+					frame.POWERBAR_OFFSET,
+					-frame.POWERBAR_OFFSET
+				)
 			elseif frame.ORIENTATION == "MIDDLE" then
-				power:Point("TOPLEFT", frame, "TOPLEFT", frame.BORDER + frame.SPACING, -frame.POWERBAR_OFFSET - frame.CLASSBAR_YOFFSET)
-				power:Point("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -frame.BORDER - frame.SPACING, frame.BORDER)
+				local totalOffset = 0
+				if frame.USE_ENERGYBAR and frame.USE_ENERGYBAR_OFFSET then
+					totalOffset = totalOffset + frame.ENERGYBAR_OFFSET
+				end
+				if frame.USE_RAGEBAR and frame.USE_RAGEBAR_OFFSET then
+					totalOffset = totalOffset + frame.RAGEBAR_OFFSET
+				end
+
+				power:Point("TOPLEFT", frame, "TOPLEFT",
+					frame.BORDER + frame.SPACING + totalOffset,
+					-(frame.POWERBAR_OFFSET + frame.CLASSBAR_YOFFSET) --+ frame.BORDER - frame.SPACING)
+				)
+				power:Point("BOTTOMRIGHT", frame, "BOTTOMRIGHT",
+					-(frame.BORDER + frame.SPACING + totalOffset),
+					frame.BORDER + frame.SPACING + totalOffset
+				)
+
+				--power.WIDTH = power.WIDTH - (frame.BORDER + frame.SPACING + totalOffset) - (frame.BORDER + frame.SPACING + totalOffset)
+				--power.HEIGHT = power.HEIGHT - (frame.BORDER + frame.SPACING + frame.CLASSBAR_YOFFSET) - (frame.BORDER + frame.SPACING + totalOffset)
+
+				--[[local totalOffset = 0
+				if frame.USE_ENERGYBAR_OFFSET then
+					totalOffset = totalOffset + frame.ENERGYBAR_OFFSET
+				end
+				if frame.USE_RAGEBAR_OFFSET then
+					totalOffset = totalOffset + frame.RAGEBAR_OFFSET
+				end
+				power:Point("TOPLEFT", frame, "TOPLEFT",
+					frame.BORDER + frame.SPACING,
+					-frame.POWERBAR_OFFSET - frame.CLASSBAR_YOFFSET
+				)
+				power:Point("BOTTOMRIGHT", frame, "BOTTOMRIGHT",
+					-frame.BORDER - frame.SPACING,
+					frame.BORDER
+				)]]
 			else
-				power:Point("TOPLEFT", frame.Health, "TOPLEFT", -frame.POWERBAR_OFFSET - (frame.HAPPINESS_WIDTH or 0), -frame.POWERBAR_OFFSET)
-				power:Point("BOTTOMRIGHT", frame.Health, "BOTTOMRIGHT", -frame.POWERBAR_OFFSET, -frame.POWERBAR_OFFSET)
+				power:Point("TOPLEFT", frame.Health, "TOPLEFT",
+					-frame.POWERBAR_OFFSET - (frame.HAPPINESS_WIDTH or 0),
+					-frame.POWERBAR_OFFSET
+				)
+				power:Point("BOTTOMRIGHT", frame.Health, "BOTTOMRIGHT",
+					-frame.POWERBAR_OFFSET,
+					-frame.POWERBAR_OFFSET
+				)
 			end
 			power:SetFrameLevel(frame.Health:GetFrameLevel() - 5) --Health uses 10
 		elseif frame.USE_INSET_POWERBAR then
+			if frame.USE_INSET_ENERGYBAR and frame.USE_ENERGYBAR then
+				power:Point("BOTTOMLEFT", frame.Energy, "TOPLEFT",
+					0,
+					frame.BORDER * 2
+				)
+				power:Point("BOTTOMRIGHT", frame.Energy, "TOPRIGHT",
+					0,
+					frame.BORDER * 2
+				)
+			else
+				if frame.USE_INSET_RAGEBAR and frame.USE_RAGEBAR then
+					power:Point("BOTTOMLEFT", frame.Rage, "TOPLEFT",
+						0,
+						frame.BORDER * 2
+					)
+					power:Point("BOTTOMRIGHT", frame.Rage, "TOPRIGHT",
+						0,
+						frame.BORDER * 2
+					)
+				else
+					power:Point("BOTTOMLEFT", frame.Health, "BOTTOMLEFT",
+						frame.BORDER + frame.BORDER * 2,
+						frame.BORDER + frame.BORDER * 2
+					)
+					power:Point("BOTTOMRIGHT", frame.Health, "BOTTOMRIGHT",
+						-(frame.BORDER + frame.BORDER * 2),
+						frame.BORDER + frame.BORDER * 2
+					)
+				end
+			end
+
 			power:Height(frame.POWERBAR_HEIGHT - (frame.BORDER + frame.SPACING) * 2)
-			power:Point("BOTTOMLEFT", frame.Health, "BOTTOMLEFT", frame.BORDER + frame.BORDER * 2, frame.BORDER + frame.BORDER * 2)
-			power:Point("BOTTOMRIGHT", frame.Health, "BOTTOMRIGHT", -(frame.BORDER + frame.BORDER * 2), frame.BORDER + frame.BORDER * 2)
 			power:SetFrameLevel(50)
 		elseif frame.USE_MINI_POWERBAR then
-			power:Height(frame.POWERBAR_HEIGHT - (frame.BORDER + frame.SPACING) * 2)
+			local totalHeight = frame.POWERBAR_HEIGHT - frame.BORDER
+			if frame.USE_ENERGYBAR and frame.USE_MINI_ENERGYBAR then
+				totalHeight = totalHeight + (frame.ENERGYBAR_HEIGHT - frame.BORDER)
+			end
+			if frame.USE_RAGEBAR and frame.USE_MINI_RAGEBAR then
+				totalHeight = totalHeight + (frame.RAGEBAR_HEIGHT - frame.BORDER)
+			end
+			local yPos = totalHeight / 2
 
 			if frame.ORIENTATION == "LEFT" then
 				power:Width(frame.POWERBAR_WIDTH - frame.BORDER * 2)
-				power:Point("RIGHT", frame, "BOTTOMRIGHT", -(frame.BORDER * 2 + 4) - (frame.HAPPINESS_WIDTH or 0), (frame.POWERBAR_HEIGHT - frame.BORDER) / 2)
+				power:Point("TOPRIGHT", frame.Health, "BOTTOMRIGHT",
+					-(frame.BORDER * 2 + 4) - (frame.HAPPINESS_WIDTH or 0),
+					yPos
+				)
 			elseif frame.ORIENTATION == "RIGHT" then
-				power:Width(frame.POWERBAR_WIDTH - frame.BORDER*2)
-				power:Point("LEFT", frame, "BOTTOMLEFT", frame.BORDER * 2 + 4 + (frame.HAPPINESS_WIDTH or 0), (frame.POWERBAR_HEIGHT - frame.BORDER) / 2)
+				power:Width(frame.POWERBAR_WIDTH - frame.BORDER * 2)
+				power:Point("TOPLEFT", frame.Health, "BOTTOMLEFT",
+					frame.BORDER * 2 + 4 + (frame.HAPPINESS_WIDTH or 0),
+					yPos
+				)
 			else
-				power:Point("LEFT", frame, "BOTTOMLEFT", frame.BORDER * 2 + 4, ((frame.POWERBAR_HEIGHT-frame.BORDER)/2))
-				power:Point("RIGHT", frame, "BOTTOMRIGHT", -(frame.BORDER * 2 + 4) - (frame.HAPPINESS_WIDTH or 0), (frame.POWERBAR_HEIGHT - frame.BORDER) / 2)
+				power:Point("TOPLEFT", frame.Health, "BOTTOMLEFT",
+					frame.BORDER * 2 + 4,
+					yPos
+				)
+				power:Point("TOPRIGHT", frame.Health, "BOTTOMRIGHT",
+					-(frame.BORDER * 2 + 4) - (frame.HAPPINESS_WIDTH or 0),
+					yPos
+				)
 			end
 
+			power:Height(frame.POWERBAR_HEIGHT - (frame.BORDER + frame.SPACING) * 2)
 			power:SetFrameLevel(50)
-		else
-			power:Point("TOPRIGHT", frame.Health.backdrop, "BOTTOMRIGHT", -frame.BORDER, -frame.SPACING * 3)
-			power:Point("TOPLEFT", frame.Health.backdrop, "BOTTOMLEFT", frame.BORDER, -frame.SPACING * 3)
+		else -- Filled
+			power:Point("TOPRIGHT", frame.Health.backdrop, "BOTTOMRIGHT",
+				-frame.BORDER,
+				-frame.SPACING * 3
+			)
+			power:Point("TOPLEFT", frame.Health.backdrop, "BOTTOMLEFT",
+				frame.BORDER,
+				-frame.SPACING * 3
+			)
 			power:Height(frame.POWERBAR_HEIGHT - (frame.BORDER + frame.SPACING) * 2)
 
 			power:SetFrameLevel(frame.Health:GetFrameLevel() - 5)
@@ -252,22 +311,20 @@ function UF:Configure_Power(frame)
 end
 
 local tokens = {[0] = "MANA", "RAGE", "FOCUS", "ENERGY", "RUNIC_POWER"}
-function UF:PostUpdatePower(unit)
+function UF:PostUpdatePowerColor()
 	local parent = self.origParent or self:GetParent()
+
 	if parent.isForced then
+		local color = ElvUF.colors.power[tokens[random(0, 4)]]
 		self:SetValue(random(1, self.max))
-	end
 
-	local hideDuplicate = IsDuplicateTrackedPower(parent, unit)
-	SetDuplicatePowerAlpha(self, hideDuplicate)
+		if not self.colorClass then
+			self:SetStatusBarColor(color[1], color[2], color[3])
 
-	if parent.db and parent.db.power and parent.db.power.hideonnpc then
-		UF:PostNamePosition(parent, unit)
-	end
-
-	--Force update to AdditionalPower in order to reposition text if necessary
-	if parent:IsElementEnabled("AdditionalPower") then
-		E:Delay(0.01, parent.AdditionalPower.ForceUpdate, parent.AdditionalPower) --Delay it slightly so Power text has a chance to clear itself first
+			if self.BG then
+				UF:UpdateBackdropTextureColor(self.BG, color[1], color[2], color[3])
+			end
+		end
 	end
 end
 
@@ -276,9 +333,6 @@ function UF:PostUpdatePower(unit)
 	if parent.isForced then
 		self:SetValue(random(1, self.max))
 	end
-
-	local hideDuplicate = IsDuplicateTrackedPower(parent, unit)
-	SetDuplicatePowerAlpha(self, hideDuplicate)
 
 	if parent.db and parent.db.power and parent.db.power.hideonnpc then
 		UF:PostNamePosition(parent, unit)

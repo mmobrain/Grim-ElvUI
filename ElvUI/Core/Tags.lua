@@ -795,3 +795,25 @@ ElvUF.Tags.Methods["energycolor"] = function()
     return Hex(0.92, 0.8, 0.2)
 end
 ElvUF.Tags.Events["energycolor"] = "UNIT_DISPLAYPOWER"
+
+-- [runiccolor]
+ElvUF.Tags.Methods["runiccolor"] = function()
+    -- 1. Try to get the custom color defined in ElvUI
+    local c = ElvUF.colors.power and (ElvUF.colors.power["RUNIC_POWER"] or ElvUF.colors.power[6])
+    -- 2. If found, return Hex
+    if c and c.r then
+        return Hex(c.r, c.g, c.b)
+    end
+    -- 3. Fallback to standard WoW #00d1ff
+    return Hex(0.0, 0.82, 1)
+end
+ElvUF.Tags.Events["runiccolor"] = "UNIT_DISPLAYPOWER"
+
+
+ElvUF.Tags.Events['runic:current'] = 'UNIT_RUNIC_POWER UNIT_MAXRUNIC_POWER UNIT_POWER_UPDATE'
+ElvUF.Tags.Methods['runic:current'] = function(unit)
+	local min = UnitPower(unit, 6)	
+	return min == 0 and '' or E:GetFormattedText('CURRENT', min, UnitPowerMax(unit, 6))
+end
+
+-- local t = {[0] = "mana", [1] = "rage", [2] = "focus", [3] = "energy", [4] = "combo points", [5] = "runes", [6] = "runic power", [7] = "soul shards", [8] = "eclipse", [9] = "holy power"};

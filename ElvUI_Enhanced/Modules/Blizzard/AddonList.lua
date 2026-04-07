@@ -5,6 +5,9 @@ local _G = _G
 local select = select
 local floor = math.floor
 local tconcat = table.concat
+local pendingMenuResize
+local gameMenuNeedsResize
+local gameMenuMeasuredHeight
 
 local CreateFrame = CreateFrame
 local DisableAddOn = DisableAddOn
@@ -206,7 +209,7 @@ local function AddonTooltip_Update(self)
 
 		local dependsStr = AddonTooltip_BuildDeps(GetAddOnDependencies(self.id))
 		if dependsStr then
-			GameTooltip:AddLine(AddonTooltip_BuildDeps(GetAddOnDependencies(self.id)))
+			GameTooltip:AddLine(dependsStr)
 		end
 	end
 
@@ -388,28 +391,48 @@ function mod:AddonList()
 		HideUIPanel(GameMenuFrame)
 		ElvUI_AddonList:Show()
 	end)
+	
 
-	-- Primary Frame Hook: Bypasses Blizzard's hard-reset of heights on menu open
-	GameMenuFrame:HookScript('OnShow', function(self)
-		local _, relativeTo = GameMenuButtonLogout:GetPoint()
+local function UpdateGameMenuHeight()
+	if not GameMenuFrame:IsShown() then return end
 
-		-- Securely re-anchor only if another addon hasn't already moved our button
-		if relativeTo ~= buttonAddons then
-			buttonAddons:Size(GameMenuButtonMacros:GetWidth(), GameMenuButtonMacros:GetHeight())
-			
-			buttonAddons:ClearAllPoints()
-			buttonAddons:Point('TOP', relativeTo, 'BOTTOM', 0, -1)
+	local top = GameMenuButtonOptions:GetTop()
+	local bottom = GameMenuButtonLogout:GetBottom()
+	if not top or not bottom then return end
 
-			GameMenuButtonLogout:ClearAllPoints()
-			GameMenuButtonLogout:Point('TOP', buttonAddons, 'BOTTOM', 0, -26)
-		end
+	local height = floor(top - bottom + 90)
+	if gameMenuMeasuredHeight ~= height then
+		gameMenuMeasuredHeight = height
+	end
 
-		-- Since default WotLK resets the GameMenuFrame height continuously, we MUST scale it every time
-		local currentHeight = self:GetHeight()
-		self:SetHeight(floor(currentHeight * 1.2))
-	end)
+	if GameMenuFrame:GetHeight() ~= gameMenuMeasuredHeight then
+		GameMenuFrame:SetHeight(gameMenuMeasuredHeight)
+	end
+end
 
-	-- Secondary state hook to maintain button Enable/Disable integrity
+GameMenuFrame:HookScript('OnShow', function(self)
+	local _, relativeTo = GameMenuButtonLogout:GetPoint()
+
+	if relativeTo ~= buttonAddons then
+		buttonAddons:SetSize(GameMenuButtonMacros:GetWidth(), GameMenuButtonMacros:GetHeight())
+		buttonAddons:ClearAllPoints()
+		buttonAddons:SetPoint('TOP', relativeTo, 'BOTTOM', 0, -1)
+
+		GameMenuButtonLogout:ClearAllPoints()
+		GameMenuButtonLogout:SetPoint('TOP', buttonAddons, 'BOTTOM', 0, -26)
+	end
+
+	gameMenuNeedsResize = true
+end)
+
+GameMenuFrame:HookScript('OnUpdate', function(self)
+	if gameMenuNeedsResize then
+		gameMenuNeedsResize = nil
+		UpdateGameMenuHeight()
+	end
+end)
+	
+	
 	GameMenuButtonLogout:HookScript('OnShow', function(self)
 		if not StaticPopup_Visible('CAMP') and not StaticPopup_Visible('QUIT') then
 			self:Enable()

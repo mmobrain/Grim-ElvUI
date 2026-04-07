@@ -222,19 +222,20 @@ function UF:Configure_Rage(frame)
 	end
 
 	rage.custom_backdrop = UF.db.colors.customragebackdrop and UF.db.colors.rage_backdrop
-	UF:ToggleTransparentStatusBar(UF.db.colors.transparentRage, rage, rage.BG, nil, UF.db.colors.invertRage)
+	UF:ToggleTransparentStatusBar(UF.db.colors.transparentRage, rage, rage.BG, nil, UF.db.colors.invertRage)		
 	UF:PostUpdateRageColor(rage)
 end
 
 function UF:PostUpdateRageColor(rageBar)
 	local rage = rageBar or self
 	local r, g, b = 0.78, 0.25, 0.25
+	
 
 	if ElvUF.colors and ElvUF.colors.power then
 		local c = ElvUF.colors.power["RAGE"] or ElvUF.colors.power[1]
 		if c and type(c.r) == "number" then r, g, b = c.r, c.g, c.b end
 	end
-
+	
 	rage:SetStatusBarColor(r, g, b)
 	if rage.BG and UF.UpdateBackdropTextureColor then
 		UF:UpdateBackdropTextureColor(rage.BG, r, g, b)

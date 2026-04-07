@@ -32,4 +32,6 @@
 	<Script file="Trinket.lua"/>	
 	<Script file="PowerEnergy.lua"/>
 	<Script file="PowerRage.lua"/>
+	<Script file="PowerMana.lua"/>
+	<Script file="PowerRunic.lua"/>	
 </Ui>

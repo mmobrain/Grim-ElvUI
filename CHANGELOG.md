@@ -1,5 +1,12 @@
 # Changelog
 
+## [v6.24 Grimfall fork] - 2026-04-07
+- **Game Menu:** Applied a cleaner fix for menu layout and background sizing.
+- **Optimizations:** Improved Rage Bar and Energy Bar handling.
+- **New:** Added a dedicated Mana Bar for player and party unitframes.
+- **Other:** Prepared support for Runic Power if it is enabled server-side in the future.
+- **Defaults:** The default Power bar and Classbar are now disabled for player and party unitframes.
+
 ## [v6.23 Grimfall fork] - 2026-04-03
 
 ### Fixed

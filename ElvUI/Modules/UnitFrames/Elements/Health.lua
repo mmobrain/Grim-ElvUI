@@ -217,29 +217,33 @@ function UF:Configure_HealthBar(frame)
 end
 
 function UF:GetHealthBottomOffset(frame)
-    local bottomOffset = 0
-    
-    -- Original Power check
-    if frame.USE_POWERBAR and not frame.POWERBAR_DETACHED and not frame.USE_INSET_POWERBAR and not frame.USE_MINI_POWERBAR then
-        bottomOffset = bottomOffset + frame.POWERBAR_HEIGHT - (frame.BORDER-frame.SPACING)
-    end
-    
-    -- Added Energy check (Only subtract height if it is attached to the frame bottom)
-    if frame.USE_ENERGYBAR and not frame.ENERGYBAR_DETACHED and not frame.USE_INSET_ENERGYBAR then
-        bottomOffset = bottomOffset + frame.ENERGYBAR_HEIGHT - (frame.BORDER-frame.SPACING)
-    end
-    
-    -- Added Rage check (Only subtract height if it is attached to the frame bottom)
-    if frame.USE_RAGEBAR and not frame.RAGEBAR_DETACHED and not frame.USE_INSET_RAGEBAR then
-        bottomOffset = bottomOffset + frame.RAGEBAR_HEIGHT - (frame.BORDER-frame.SPACING)
-    end
-    
-    -- Original InfoPanel check
-    if frame.USE_INFO_PANEL then
-        bottomOffset = bottomOffset + frame.INFO_PANEL_HEIGHT - (frame.BORDER - frame.SPACING)
-    end
+	local bottomOffset = 0
+	
+	if frame.USE_POWERBAR and not frame.POWERBAR_DETACHED and not frame.USE_INSET_POWERBAR and not frame.USE_MINI_POWERBAR then
+		bottomOffset = bottomOffset + frame.POWERBAR_HEIGHT - (frame.BORDER-frame.SPACING)
+	end
+	
+	if frame.USE_ENERGYBAR and not frame.ENERGYBAR_DETACHED and not frame.USE_INSET_ENERGYBAR then
+		bottomOffset = bottomOffset + frame.ENERGYBAR_HEIGHT - (frame.BORDER-frame.SPACING)
+	end
+	
+	if frame.USE_RAGEBAR and not frame.RAGEBAR_DETACHED and not frame.USE_INSET_RAGEBAR then
+		bottomOffset = bottomOffset + frame.RAGEBAR_HEIGHT - (frame.BORDER-frame.SPACING)
+	end
 
-    return bottomOffset
+	if frame.USE_MANABAR and not frame.MANABAR_DETACHED and not frame.USE_INSET_MANABAR then
+		bottomOffset = bottomOffset + frame.MANABAR_HEIGHT - (frame.BORDER-frame.SPACING)
+	end
+
+	if frame.USE_RUNICBAR and not frame.RUNICBAR_DETACHED and not frame.USE_INSET_RUNICBAR then
+		bottomOffset = bottomOffset + frame.RUNICBAR_HEIGHT - (frame.BORDER-frame.SPACING)
+	end
+	
+	if frame.USE_INFO_PANEL then
+		bottomOffset = bottomOffset + frame.INFO_PANEL_HEIGHT - (frame.BORDER - frame.SPACING)
+	end
+
+	return bottomOffset
 end
 
 function UF:PostUpdateHealthColor(unit, r, g, b)

@@ -1310,6 +1310,18 @@ P.unitframe = {
 		classpower_backdrop = {r = 0.5, g = 0.5, b = 0.5},
 		aurabar_backdrop = {r = 0.5, g = 0.5, b = 0.5},
 		power_backdrop = {r = 0.5, g = 0.5, b = 0.5},
+		mana_backdrop = {r = 0.5, g = 0.5, b = 0.5},
+		runic_backdrop = {r = 0.5, g = 0.5, b = 0.5},
+		energy_backdrop = {r = 0.5, g = 0.5, b = 0.5},
+		rage_backdrop = {r = 0.5, g = 0.5, b = 0.5},
+		transparentMana = false,
+		transparentRunic = false,
+		transparentEnergy = false,
+		transparentRage = false,
+		invertMana = false,
+		invertRunic = false,
+		invertEnergy = false,
+		invertRage = false,
 		tapped = {r = 0.55, g = 0.57, b = 0.61},
 		disconnected = {r = 0.84, g = 0.75, b = 0.65},
 		auraBarBuff = {r = 0.31, g = 0.31, b = 0.31},
@@ -1318,7 +1330,9 @@ P.unitframe = {
 			MANA = {r = 0.31, g = 0.45, b = 0.63},
 			RAGE = {r = 0.78, g = 0.25, b = 0.25},
 			FOCUS = {r = 0.71, g = 0.43, b = 0.27},
-			ENERGY = {r = 0.65, g = 0.63, b = 0.35},
+			ENERGY = {r = 0.65, g = 0.63, b = 0.35},			
+			COMBO_POINTS = { r = 0.69, g = 0.31, b = 0.31 }, --for API order compatibility
+			RUNES = {r = 1.0, g = 0.0, b = 0.0 }, --for API order compatibility
 			RUNIC_POWER = {r = 0, g = 0.82, b = 1}
 		},
 		reaction = {
@@ -1418,7 +1432,7 @@ P.unitframe = {
 				delay = 0
 			},
 			power = {
-				enable = true,
+				enable = false,
 				text_format = "[powercolor][power:current]",
 				width = "fill",
 				height = 10,
@@ -1442,7 +1456,7 @@ P.unitframe = {
 				  enable = true,
 				  text_format = "[energycolor][energy:current]",
 				  width = "fill",
-				  height = 10,
+				  height = 8,
 				  xOffset = 0,
 				  yOffset = 0,
 				  position = "LEFT",
@@ -1466,12 +1480,60 @@ P.unitframe = {
 			  enable = true,
 			  text_format = "[ragecolor][rage:current]",
 			  width = "fill",
-			  height = 10,
+			  height = 7,
 			  xOffset = 0,
 			  yOffset = 0,
 			  position = "LEFT",
 			  hideonnpc = false,
 			  attachTextTo = "Rage",
+			  detachFromFrame = false,
+			  detachedWidth = 250,
+			  colors = {
+					enable = false,
+					color = { r = 1, g = 1, b = 1, a = 1 } -- White default
+				},
+			  strataAndLevel = {
+				useCustomStrata = false,
+				frameStrata = "LOW",
+				useCustomLevel = false,
+				frameLevel = 1
+			  },
+			  parent = "FRAME"
+		    },
+		    mana = {
+			  enable = true,
+			  text_format = "[manacolor][mana:current]",
+			  width = "fill",
+			  height = 9,
+			  xOffset = 0,
+			  yOffset = 0,
+			  position = "LEFT",
+			  hideonnpc = false,
+			  attachTextTo = "Mana",
+			  detachFromFrame = false,
+			  detachedWidth = 250,
+			  colors = {
+					enable = false,
+					color = { r = 1, g = 1, b = 1, a = 1 } -- White default
+				},
+			  strataAndLevel = {
+				useCustomStrata = false,
+				frameStrata = "LOW",
+				useCustomLevel = false,
+				frameLevel = 1
+			  },
+			  parent = "FRAME"
+		    },
+		    runic = {
+			  enable = false,
+			  text_format = "[runiccolor][runic:current]",
+			  width = "fill",
+			  height = 7,
+			  xOffset = 0,
+			  yOffset = 0,
+			  position = "LEFT",
+			  hideonnpc = false,
+			  attachTextTo = "Runic",
 			  detachFromFrame = false,
 			  detachedWidth = 250,
 			  colors = {
@@ -1609,7 +1671,7 @@ P.unitframe = {
 				}
 			},
 			classbar = {
-				enable = true,
+				enable = false,
 				fill = "fill",
 				height = 10,
 				autoHide = false,
@@ -3066,7 +3128,7 @@ P.unitframe = {
 				delay = 0
 			},
 			power = {
-				enable = true,
+				enable = false,
 				text_format = "[powercolor][power:current]",
 				attachTextTo = "Health",
 				width = "fill",
@@ -3077,6 +3139,102 @@ P.unitframe = {
 				yOffset = 0,
 				xOffset = -2
 			},
+			energy = {
+				  enable = true,
+				  text_format = "[energycolor][energy:current]",
+				  width = "fill",
+				  height = 5,
+				  xOffset = 0,
+				  yOffset = 0,
+				  position = "LEFT",
+				  hideonnpc = false,
+				  attachTextTo = "Energy",
+				  detachFromFrame = false,
+				  detachedWidth = 250,
+				colors = {
+					enable = false,
+					color = { r = 1, g = 1, b = 1, a = 1 } -- White default
+				},
+				  strataAndLevel = {
+					useCustomStrata = false,
+					frameStrata = "LOW",
+					useCustomLevel = false,
+					frameLevel = 1
+				  },
+				  parent = "FRAME"
+		    },
+		    rage = {
+			  enable = true,
+			  text_format = "[ragecolor][rage:current]",
+			  width = "fill",
+			  height = 5,
+			  xOffset = 0,
+			  yOffset = 0,
+			  position = "LEFT",
+			  hideonnpc = false,
+			  attachTextTo = "Rage",
+			  detachFromFrame = false,
+			  detachedWidth = 250,
+			  colors = {
+					enable = false,
+					color = { r = 1, g = 1, b = 1, a = 1 } -- White default
+				},
+			  strataAndLevel = {
+				useCustomStrata = false,
+				frameStrata = "LOW",
+				useCustomLevel = false,
+				frameLevel = 1
+			  },
+			  parent = "FRAME"
+		    },
+		    mana = {
+			  enable = true,
+			  text_format = "[manacolor][mana:current]",
+			  width = "fill",
+			  height = 6,
+			  xOffset = 0,
+			  yOffset = 0,
+			  position = "LEFT",
+			  hideonnpc = false,
+			  attachTextTo = "Mana",
+			  detachFromFrame = false,
+			  detachedWidth = 250,
+			  colors = {
+					enable = false,
+					color = { r = 1, g = 1, b = 1, a = 1 } -- White default
+				},
+			  strataAndLevel = {
+				useCustomStrata = false,
+				frameStrata = "LOW",
+				useCustomLevel = false,
+				frameLevel = 1
+			  },
+			  parent = "FRAME"
+		    },
+		    runic = {
+			  enable = false,
+			  text_format = "[runiccolor][runic:current]",
+			  width = "fill",
+			  height = 4,
+			  xOffset = 0,
+			  yOffset = 0,
+			  position = "LEFT",
+			  hideonnpc = false,
+			  attachTextTo = "Runic",
+			  detachFromFrame = false,
+			  detachedWidth = 250,
+			  colors = {
+					enable = false,
+					color = { r = 1, g = 1, b = 1, a = 1 } -- White default
+				},
+			  strataAndLevel = {
+				useCustomStrata = false,
+				frameStrata = "LOW",
+				useCustomLevel = false,
+				frameLevel = 1
+			  },
+			  parent = "FRAME"
+		    },
 			infoPanel = {
 				enable = false,
 				height = 15,
