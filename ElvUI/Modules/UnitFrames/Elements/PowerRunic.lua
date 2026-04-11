@@ -23,22 +23,21 @@ local function IsHero()
 	return E.myclass == "Hero" or E.myclass == "HERO" or locClass == "Hero" or tokenClass == "Hero"
 end
 
-local function UpdateCustomRunicFromRunePowerUpdate(self, event)
-	if not self.USE_RUNICBAR or not self.Runic then return end
-	self.Runic:SetValue(UnitPower(self.unit, 6) or 0)
-	if self.Runic.PostUpdate then self.Runic:PostUpdate(self.unit) 
-	print("self.unit= "..self.unit)
-	end
-end
-
--- local function UpdateCustomRunicFromPowerUpdate(self, event, unit, powerType)
-	-- if powerType ~= "RUNIC_POWER" then return end
-	-- if not unit then unit = self.unit end
-	-- if self.unit ~= unit then return end
-
-	-- self.Runic:SetValue(UnitPower(unit, 6) or 0)
-	-- if self.Runic.PostUpdate then self.Runic:PostUpdate(unit) end
+-- local function UpdateCustomRunicFromRunePowerUpdate(self, event)
+	-- if not self.USE_RUNICBAR or not self.Runic then return end
+	-- self.Runic:SetValue(UnitPower(self.unit, 6) or 0)
+	-- if self.Runic.PostUpdate then self.Runic:PostUpdate(self.unit) 	
+	-- end
 -- end
+
+local function UpdateCustomRunicFromPowerUpdate(self, event, unit, powerType)
+	if powerType ~= "RUNIC_POWER" then return end
+	if not unit then unit = self.unit end
+	if self.unit ~= unit then return end
+
+	self.Runic:SetValue(UnitPower(unit, 6) or 0)
+	if self.Runic.PostUpdate then self.Runic:PostUpdate(unit) end
+end
 
 
 local function UpdateCustomRunic(self, event, unit)
@@ -139,8 +138,8 @@ function UF:Configure_Runic(frame)
 
 		frame:RegisterEvent("UNIT_RUNIC_POWER", UpdateCustomRunic)
 		frame:RegisterEvent("UNIT_MAXRUNIC_POWER", UpdateCustomMaxRunic)
-		frame:RegisterEvent("RUNE_POWER_UPDATE", UpdateCustomRunicFromRunePowerUpdate)
-		--frame:RegisterEvent("UNIT_POWER_UPDATE", UpdateCustomRunicFromPowerUpdate)
+		--frame:RegisterEvent("RUNE_POWER_UPDATE", UpdateCustomRunicFromRunePowerUpdate)
+		frame:RegisterEvent("UNIT_POWER_UPDATE", UpdateCustomRunicFromPowerUpdate)
 		
 		if frame.unit == "target" then
 			frame:RegisterEvent("PLAYER_TARGET_CHANGED", UpdateCustomRunic)
@@ -161,8 +160,8 @@ function UF:Configure_Runic(frame)
 		
 		frame:UnregisterEvent("UNIT_RUNIC_POWER", UpdateCustomRunic)
 		frame:UnregisterEvent("UNIT_MAXRUNIC_POWER", UpdateCustomMaxRunic)
-		frame:UnregisterEvent("RUNE_POWER_UPDATE", UpdateCustomRunicFromRunePowerUpdate)
-		--frame:UnregisterEvent("UNIT_POWER_UPDATE", UpdateCustomRunicFromPowerUpdate)
+		--frame:UnregisterEvent("RUNE_POWER_UPDATE", UpdateCustomRunicFromRunePowerUpdate)
+		frame:UnregisterEvent("UNIT_POWER_UPDATE", UpdateCustomRunicFromPowerUpdate)
 		
 		if frame.unit == "target" then
 			frame:UnregisterEvent("PLAYER_TARGET_CHANGED", UpdateCustomRunic)

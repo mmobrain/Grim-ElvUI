@@ -10,6 +10,17 @@ local _, ns = ...
 local ElvUF = ns.oUF
 assert(ElvUF, "ElvUI was unable to locate oUF.")
 
+local function AdditionalPower_OnUpdate(self, elapsed)
+	self.delayTimer = (self.delayTimer or 0) + elapsed
+	if self.delayTimer >= 0.01 then
+		self:SetScript("OnUpdate", nil)
+		self.delayTimer = 0
+		if self.ForceUpdate then
+			self:ForceUpdate()
+		end
+	end
+end
+
 local UnitPowerType = UnitPowerType
 
 local function IsDuplicateTrackedPower(frame, unit)
@@ -265,9 +276,10 @@ function UF:PostUpdatePower(unit)
 		UF:PostNamePosition(parent, unit)
 	end
 
-	--Force update to AdditionalPower in order to reposition text if necessary
+	-- ANTI-FREEZE / GC LEAK FIX: Use a reusable OnUpdate instead of E:Delay to prevent memory bloat
 	if parent:IsElementEnabled("AdditionalPower") then
-		E:Delay(0.01, parent.AdditionalPower.ForceUpdate, parent.AdditionalPower) --Delay it slightly so Power text has a chance to clear itself first
+		parent.AdditionalPower.delayTimer = 0
+		parent.AdditionalPower:SetScript("OnUpdate", AdditionalPower_OnUpdate)
 	end
 end
 

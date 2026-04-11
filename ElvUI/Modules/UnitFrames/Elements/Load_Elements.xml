@@ -34,4 +34,5 @@
 	<Script file="PowerRage.lua"/>
 	<Script file="PowerMana.lua"/>
 	<Script file="PowerRunic.lua"/>	
+	<Script file="Runes.lua"/>	
 </Ui>

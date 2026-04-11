@@ -1524,30 +1524,30 @@ P.unitframe = {
 			  },
 			  parent = "FRAME"
 		    },
-		    runic = {
-			  enable = false,
-			  text_format = "[runiccolor][runic:current]",
-			  width = "fill",
-			  height = 7,
-			  xOffset = 0,
-			  yOffset = 0,
-			  position = "LEFT",
-			  hideonnpc = false,
-			  attachTextTo = "Runic",
-			  detachFromFrame = false,
-			  detachedWidth = 250,
-			  colors = {
-					enable = false,
-					color = { r = 1, g = 1, b = 1, a = 1 } -- White default
-				},
-			  strataAndLevel = {
-				useCustomStrata = false,
-				frameStrata = "LOW",
-				useCustomLevel = false,
-				frameLevel = 1
-			  },
-			  parent = "FRAME"
-		    },
+		    -- runic = {
+			  -- enable = false,
+			  -- text_format = "[runiccolor][runic:current]",
+			  -- width = "fill",
+			  -- height = 7,
+			  -- xOffset = 0,
+			  -- yOffset = 0,
+			  -- position = "LEFT",
+			  -- hideonnpc = false,
+			  -- attachTextTo = "Runic",
+			  -- detachFromFrame = false,
+			  -- detachedWidth = 250,
+			  -- colors = {
+					-- enable = false,
+					-- color = { r = 1, g = 1, b = 1, a = 1 } -- White default
+				-- },
+			  -- strataAndLevel = {
+				-- useCustomStrata = false,
+				-- frameStrata = "LOW",
+				-- useCustomLevel = false,
+				-- frameLevel = 1
+			  -- },
+			  -- parent = "FRAME"
+		    -- },
 			infoPanel = {
 				enable = false,
 				height = 20,
@@ -1671,7 +1671,7 @@ P.unitframe = {
 				}
 			},
 			classbar = {
-				enable = false,
+				enable = true,
 				fill = "fill",
 				height = 10,
 				autoHide = false,
@@ -3211,30 +3211,30 @@ P.unitframe = {
 			  },
 			  parent = "FRAME"
 		    },
-		    runic = {
-			  enable = false,
-			  text_format = "[runiccolor][runic:current]",
-			  width = "fill",
-			  height = 4,
-			  xOffset = 0,
-			  yOffset = 0,
-			  position = "LEFT",
-			  hideonnpc = false,
-			  attachTextTo = "Runic",
-			  detachFromFrame = false,
-			  detachedWidth = 250,
-			  colors = {
-					enable = false,
-					color = { r = 1, g = 1, b = 1, a = 1 } -- White default
-				},
-			  strataAndLevel = {
-				useCustomStrata = false,
-				frameStrata = "LOW",
-				useCustomLevel = false,
-				frameLevel = 1
-			  },
-			  parent = "FRAME"
-		    },
+		    -- runic = {
+			  -- enable = true,
+			  -- text_format = "[runiccolor][runic:current]",
+			  -- width = "fill",
+			  -- height = 4,
+			  -- xOffset = 0,
+			  -- yOffset = 0,
+			  -- position = "LEFT",
+			  -- hideonnpc = false,
+			  -- attachTextTo = "Runic",
+			  -- detachFromFrame = false,
+			  -- detachedWidth = 250,
+			  -- colors = {
+					-- enable = false,
+					-- color = { r = 1, g = 1, b = 1, a = 1 } -- White default
+				-- },
+			  -- strataAndLevel = {
+				-- useCustomStrata = false,
+				-- frameStrata = "LOW",
+				-- useCustomLevel = false,
+				-- frameLevel = 1
+			  -- },
+			  -- parent = "FRAME"
+		    -- },
 			infoPanel = {
 				enable = false,
 				height = 15,

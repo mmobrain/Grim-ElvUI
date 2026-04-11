@@ -71,7 +71,7 @@ function UF:Construct_RageBar(frame, bg, text, textPos)
 		rage.value = frame.RaisedElementParent:CreateFontString(nil, "OVERLAY")
 		UF:Configure_FontString(rage.value)
 		rage.value:Point(anchorPoint, rage, anchorPoint, -2, 0)
-		rage.value.frequentUpdates = true
+		rage.value.frequentUpdates = false
 		rage.value:Hide()
 	end
 

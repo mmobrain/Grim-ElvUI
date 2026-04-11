@@ -1,6 +1,6 @@
 ## Interface: 30300
 ## Author: Elv, Bunny
-## Version: 6.23 Grimfall fork
+## Version: 6.25 Grimfall fork
 ## Title: |cff1784d1E|r|cffe5e3e3lvUI|r
 ## Notes: User Interface replacement AddOn for World of Warcraft.
 ## SavedVariables: ElvDB, ElvPrivateDB
