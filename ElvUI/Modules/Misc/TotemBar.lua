@@ -42,24 +42,35 @@ function TOTEMS:UpdateTotem(event, slot)
 	end
 end
 
+local function IsShamanClass()
+	local locClass, tokenClass = UnitClass("player")
+	return E.myclass == "SHAMAN" or E.myclass == "Hero" or E.myclass == "HERO"
+		or locClass == "Hero" or tokenClass == "Hero"
+end
+
 function TOTEMS:ToggleEnable()
-	if E.db.general.totems.enable then
-		if self.Initialized then
-			self.bar:Show()
-			self:RegisterEvent("PLAYER_TOTEM_UPDATE", "UpdateTotem")
-			self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateAllTotems")
-			self:UpdateAllTotems()
-			E:EnableMover("TotemBarMover")
-		elseif E.myclass == "SHAMAN" then
-			self:Initialize()
-			self:UpdateAllTotems()
+	if not E.db.general.totems.enable then
+		if self.Initialized and self.bar then
+			self.bar:Hide()
+			self:UnregisterEvent("PLAYER_TOTEM_UPDATE")
+			self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+			E:DisableMover("TotemBarMover")
 		end
-	elseif self.Initialized then
-		self.bar:Hide()
-		self:UnregisterEvent("PLAYER_TOTEM_UPDATE")
-		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-		E:DisableMover("TotemBarMover")
+		return
 	end
+
+	if not self.Initialized then
+		if not IsShamanClass() then return end
+		self:Initialize()
+	end
+
+	if not self.Initialized or not self.bar then return end
+
+	self.bar:Show()
+	self:RegisterEvent("PLAYER_TOTEM_UPDATE", "UpdateTotem")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD", "UpdateAllTotems")
+	self:UpdateAllTotems()
+	E:EnableMover("TotemBarMover")
 end
 
 function TOTEMS:PositionAndSize()
@@ -125,7 +136,7 @@ local function UpdateTooltip(self)
 end
 
 function TOTEMS:Initialize()
-	if not E.db.general.totems.enable or E.myclass ~= "SHAMAN" then return end
+	if not E.db.general.totems.enable or not IsShamanClass() then return end
 
 	self.db = E.db.general.totems
 

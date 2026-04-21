@@ -22,6 +22,12 @@ local function GetChatWindowInfo()
 	return ChatTabInfo
 end
 
+local function IsShamanClass()
+    local locClass, tokenClass = UnitClass("player")
+    return E.myclass == "SHAMAN" or E.myclass == "Hero" or E.myclass == "HERO"
+        or locClass == "Hero" or tokenClass == "Hero"
+end
+
 E.Options.args.general = {
 	order = 1,
 	type = "group",
@@ -394,7 +400,7 @@ E.Options.args.general = {
 			name = L["Class Totems"],
 			get = function(info) return E.db.general.totems[info[#info]] end,
 			set = function(info, value) E.db.general.totems[info[#info]] = value Totems:PositionAndSize() end,
-			hidden = function() return E.myclass ~= "SHAMAN" end,
+			hidden = function() return not IsShamanClass() end,
 			args = {
 				header = {
 					order = 1,

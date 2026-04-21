@@ -1,5 +1,11 @@
 # Changelog
 
+## [v6.26 Grimfall fork] - 2026-04-21
+- **TotemBar fix for Grimfall Server:** Fixed Grimfall Hero/Shaman detection and TotemBar initialization so the bar, settings, bindings, and MultiCast totem selection now work correctly again.
+
+## [v6.25 Grimfall fork] - 2026-04-11
+- **New:** Added a dedicated Rune Bar for player unitframe.
+
 ## [v6.24 Grimfall fork] - 2026-04-07
 - **Game Menu:** Applied a cleaner fix for menu layout and background sizing.
 - **Optimizations:** Improved Rage Bar and Energy Bar handling.

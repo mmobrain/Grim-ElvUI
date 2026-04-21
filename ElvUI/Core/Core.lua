@@ -767,49 +767,13 @@ do
 	local SendMessageWaiting
 	local SendRecieveGroupSize = 0
 
-	function E:SendMessage()
-		--[[if GetNumRaidMembers() > 1 then
-			local _, instanceType = IsInInstance()
-			if instanceType == "pvp" then
-				SendAddonMessage("ELVUI_VERSIONCHK", E.version, "BATTLEGROUND")
-			else
-				SendAddonMessage("ELVUI_VERSIONCHK", E.version, "RAID")
-			end
-		elseif GetNumPartyMembers() > 0 then
-			SendAddonMessage("ELVUI_VERSIONCHK", E.version, "PARTY")
-		elseif IsInGuild() then
-			SendAddonMessage("ELVUI_VERSIONCHK", E.version, "GUILD")
-		end]]
-
+	function E:SendMessage()		
 		SendMessageWaiting = nil
 	end
 
 	local function SendRecieve(_, event, prefix, message, _, sender)
-		if event == "CHAT_MSG_ADDON" then
-			--[[if prefix ~= "ELVUI_VERSIONCHK" then return end
-			if not sender or sender == E.myname then return end
-
-			local ver = tonumber(E.version)
-			message = tonumber(message)
-
-			if ver ~= G.general.version then
-				if not E.shownUpdatedWhileRunningPopup and not InCombatLockdown() then
-					E:StaticPopup_Show("ELVUI_UPDATED_WHILE_RUNNING")
-
-					E.shownUpdatedWhileRunningPopup = true
-				end
-			elseif message and (message > ver) then
-				if not E.recievedOutOfDateMessage then
-					E:Print(L["ElvUI is out of date. You can download the newest version from https://github.com/ElvUI-WotLK/ElvUI"])
-
-					if message and ((message - ver) >= 0.01) and not InCombatLockdown() then
-						E:StaticPopup_Show("ELVUI_UPDATE_AVAILABLE")
-					end
-
-					E.recievedOutOfDateMessage = true
-				end
-			end]]
-		elseif event == "PARTY_MEMBERS_CHANGED" or event == "RAID_ROSTER_UPDATE" then
+		--if event == "CHAT_MSG_ADDON" then			
+		if event == "PARTY_MEMBERS_CHANGED" or event == "RAID_ROSTER_UPDATE" then
 			local numRaid = GetNumRaidMembers()
 			local num = numRaid > 0 and numRaid or (GetNumPartyMembers() + 1)
 			if num ~= SendRecieveGroupSize then
@@ -915,10 +879,19 @@ function E:UpdateAll(ignoreInstall)
 
 	Threat:ToggleEnable()
 	Threat:UpdatePosition()
+	
+	
 
-	if E.myclass == "SHAMAN" then
-		Totems:ToggleEnable()
-		Totems:PositionAndSize()
+	local locClass, tokenClass = UnitClass("player")
+	
+	if E.myclass == "SHAMAN" or E.myclass == "Hero" or E.myclass == "HERO"
+	    or locClass == "Hero" or tokenClass == "Hero" then
+	    if Totems and Totems.ToggleEnable then
+		  Totems:ToggleEnable()
+	    end
+	    if Totems and Totems.PositionAndSize then
+		  Totems:PositionAndSize()
+	    end
 	end
 
 	if E.private.unitframe.enable then

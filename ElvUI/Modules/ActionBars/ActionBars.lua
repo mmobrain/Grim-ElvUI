@@ -89,6 +89,12 @@ AB.customExitButton = {
 	tooltip = LEAVE_VEHICLE
 }
 
+local function IsShamanClass()
+    local locClass, tokenClass = UnitClass("player")
+    return E.myclass == "SHAMAN" or E.myclass == "Hero" or E.myclass == "HERO"
+        or locClass == "Hero" or tokenClass == "Hero"
+end
+
 function AB:PositionAndSizeBar(barName)
 	local buttonSpacing = E:Scale(self.db[barName].buttonspacing)
 	local backdropSpacing = E:Scale((self.db[barName].backdropSpacing or self.db[barName].buttonspacing))
@@ -383,7 +389,7 @@ function AB:ReassignBindings(event)
 		self:UpdatePetBindings()
 		self:UpdateStanceBindings()
 
-		if E.myclass == "SHAMAN" then
+		if IsShamanClass() then
 			self:UpdateTotemBindings()
 		end
 	end
@@ -490,7 +496,7 @@ function AB:UpdateButtonSettings()
 	self:UpdatePetBindings()
 	self:UpdateStanceBindings()
 
-	if E.myclass == "SHAMAN" then
+	if IsShamanClass() then
 		self:UpdateTotemBindings()
 	end
 
@@ -732,7 +738,7 @@ function AB:DisableBlizzard()
 		_G["BonusActionButton"..i]:UnregisterAllEvents()
 		_G["BonusActionButton"..i]:SetAttribute("statehidden", true)
 
-		if E.myclass ~= "SHAMAN" then
+		if not IsShamanClass() then
 			_G["MultiCastActionButton"..i]:Hide()
 			_G["MultiCastActionButton"..i]:UnregisterAllEvents()
 			_G["MultiCastActionButton"..i]:SetAttribute("statehidden", true)
@@ -778,7 +784,7 @@ function AB:DisableBlizzard()
 	VehicleMenuBar:Hide()
 	VehicleMenuBar:SetParent(UIHider)
 
-	if E.myclass ~= "SHAMAN" then
+	if not IsShamanClass() then
 		MultiCastActionBarFrame:UnregisterAllEvents()
 		MultiCastActionBarFrame:Hide()
 		MultiCastActionBarFrame:SetParent(UIHider)
@@ -1008,7 +1014,7 @@ function AB:Initialize()
 	self:CreateBarShapeShift()
 	self:CreateVehicleLeave()
 
-	if E.myclass == "SHAMAN" and self.db.barTotem.enabled then
+	if IsShamanClass() and self.db.barTotem.enabled then
 		self:CreateTotemBar()
 	end
 
