@@ -9,7 +9,7 @@ local pcall = pcall
 local setfenv = setfenv
 local tonumber = tonumber
 local type = type
-local format, gsub, len, split, sub = string.format, string.gsub, string.len, string.split, string.sub
+local format, gsub, len, split, sub, strmatch = string.format, string.gsub, string.len, string.split, string.sub, string.match
 --WoW API / Variables
 local CreateFrame = CreateFrame
 local GetNumRaidMembers, UnitInRaid = GetNumRaidMembers, UnitInRaid
@@ -20,6 +20,7 @@ local ACCEPT, CANCEL, YES, NO = ACCEPT, CANCEL, YES, NO
 -- CONSTANTS
 ----------------------------------
 
+local EXPORT_PREFIX = "!E1!"
 local REQUEST_PREFIX = "ELVUI_REQUEST"
 local REPLY_PREFIX = "ELVUI_REPLY"
 local TRANSFER_PREFIX = "ELVUI_TRANSFER"
@@ -380,7 +381,9 @@ end
 function D:GetImportStringType(dataString)
 	local stringType = ""
 
-	if LibBase64:IsBase64(dataString) then
+	if strmatch(dataString, "^" .. EXPORT_PREFIX) then
+		stringType = "Deflate"
+	elseif LibBase64:IsBase64(dataString) then
 		stringType = "Base64"
 	elseif sub(dataString, 1, 1) == "{" then --Basic check to weed out obviously wrong strings
 		stringType = "Table"
@@ -393,7 +396,46 @@ function D:Decode(dataString)
 	local profileInfo, profileType, profileKey, profileData
 	local stringType = self:GetImportStringType(dataString)
 
-	if stringType == "Base64" then
+	if stringType == "Deflate" then
+		local LibDeflate = LibStub("LibDeflate", true)
+		if not LibDeflate then
+			E:Print("Error: LibDeflate is missing! Please install LibDeflate into ElvUI/Libraries/ to import this profile.")
+			return
+		end
+
+		local data = gsub(dataString, "^" .. EXPORT_PREFIX, "")
+		local decodedData = LibDeflate:DecodeForPrint(data)
+		
+		if not decodedData then
+			E:Print("Error decoding data. Import string may be corrupted!")
+			return
+		end
+
+		local decompressedData = LibDeflate:DecompressDeflate(decodedData)
+
+		if not decompressedData then
+			E:Print("Error decompressing data. Import string may be corrupted!")
+			return
+		end
+
+		local serializedData, success
+		serializedData, profileInfo = E:SplitString(decompressedData, "^^::") -- "^^" indicates the end of the AceSerializer string
+
+		if not profileInfo then
+			E:Print("Error importing profile. String is invalid or corrupted!")
+			return
+		end
+
+		serializedData = format("%s%s", serializedData, "^^") --Add back the AceSerializer terminator
+		profileType, profileKey = E:SplitString(profileInfo, "::")
+		success, profileData = D:Deserialize(serializedData)
+
+		if not success then
+			E:Print("Error deserializing:", profileData)
+			return
+		end
+
+	elseif stringType == "Base64" then
 		local decodedData = LibBase64:Decode(dataString)
 		local decompressedData, decompressedMessage = LibCompress:Decompress(decodedData)
 

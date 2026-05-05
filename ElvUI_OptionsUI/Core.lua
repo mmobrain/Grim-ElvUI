@@ -2,11 +2,21 @@ local E = unpack(ElvUI) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalD
 local D = E:GetModule("Distributor")
 
 local _, Engine = ...
-Engine[1] = {}
-Engine[2] = E.Libs.ACL:GetLocale("ElvUI", E.global.general.locale or "enUS")
+Engine[1] = {Blank = function() return '' end }
+
+local gameLocale
+do -- Locale doesn't exist yet, make it exist.
+	local convert = {["enGB"] = "enUS", ["esES"] = "esMX", ["itIT"] = "enUS"}
+	local lang = GetLocale()
+
+	gameLocale = convert[lang] or lang or "enUS"
+	Engine[2] = E.Libs.ACL:GetLocale("ElvUI", E.global and E.global.general and E.global.general.locale or gameLocale)
+end
 local C, L = Engine[1], Engine[2]
 
-local format = string.format
+local format, strmatch, strsplit = string.format, string.match, string.split
+local tconcat, tinsert, tremove = table.concat, table.insert, table.remove
+local ipairs, gsub = ipairs, string.gsub
 
 C.Values = {
 	FontFlags = {
@@ -17,11 +27,77 @@ C.Values = {
 	}
 }
 
+do
+	C.StateSwitchGetText = function(_, TEXT)
+		local friend, enemy = strmatch(TEXT, '^Friendly:([^,]*)'), strmatch(TEXT, '^Enemy:([^,]*)')
+		local text, blockB, blockS, blockT = friend or enemy or TEXT
+		local SF, localized = E.global.unitframe.specialFilters[text], L[text]
+		if SF and localized and text:match('^block') then blockB, blockS, blockT = localized:match('^%[(.-)](%s?)(.+)') end
+		local filterText = (blockB and format('|cFF999999%s|r%s%s', blockB, blockS, blockT)) or localized or text
+		return (friend and format('|cFF33FF33%s|r %s', _G.FRIEND, filterText)) or (enemy and format('|cFFFF3333%s|r %s', _G.ENEMY, filterText)) or filterText
+	end
+
+	local function filterMatch(s,v)
+		local m1, m2, m3, m4 = '^'..v..'$', '^'..v..',', ','..v..'$', ','..v..','
+		return (strmatch(s, m1) and m1) or (strmatch(s, m2) and m2) or (strmatch(s, m3) and m3) or (strmatch(s, m4) and v..',')
+	end
+
+	C.SetFilterPriority = function(db, groupName, auraType, value, remove, movehere, friendState)
+		if not auraType or not value then return end
+		local filter = db[groupName] and db[groupName][auraType] and db[groupName][auraType].priority
+		if not filter then return end
+		local found = filterMatch(filter, E:EscapeString(value))
+		if found and movehere then
+			local tbl, sv, sm = {strsplit(',',filter)}
+			for i in ipairs(tbl) do
+				if tbl[i] == value then sv = i elseif tbl[i] == movehere then sm = i end
+				if sv and sm then break end
+			end
+			tremove(tbl, sm)
+			tinsert(tbl, sv, movehere)
+			db[groupName][auraType].priority = tconcat(tbl,',')
+		elseif found and friendState then
+			local realValue = strmatch(value, '^Friendly:([^,]*)') or strmatch(value, '^Enemy:([^,]*)') or value
+			local friend = filterMatch(filter, E:EscapeString('Friendly:'..realValue))
+			local enemy = filterMatch(filter, E:EscapeString('Enemy:'..realValue))
+			local default = filterMatch(filter, E:EscapeString(realValue))
+
+			local state =
+			(friend and (not enemy) and format('%s%s','Enemy:',realValue))					--[x] friend [ ] enemy: > enemy
+			or	((not enemy and not friend) and format('%s%s','Friendly:',realValue))			--[ ] friend [ ] enemy: > friendly
+			or	(enemy and (not friend) and default and format('%s%s','Friendly:',realValue))	--[ ] friend [x] enemy: (default exists) > friendly
+			or	(enemy and (not friend) and strmatch(value, '^Enemy:') and realValue)			--[ ] friend [x] enemy: (no default) > realvalue
+			or	(friend and enemy and realValue)												--[x] friend [x] enemy: > default
+
+			if state then
+				local stateFound = filterMatch(filter, E:EscapeString(state))
+				if not stateFound then
+					local tbl, sv = {strsplit(',',filter)}
+					for i in ipairs(tbl) do
+						if tbl[i] == value then
+							sv = i
+							break
+						end
+					end
+					tinsert(tbl, sv, state)
+					tremove(tbl, sv+1)
+					db[groupName][auraType].priority = tconcat(tbl,',')
+				end
+			end
+		elseif found and remove then
+			db[groupName][auraType].priority = gsub(filter, found, '')
+		elseif not found and not remove then
+			db[groupName][auraType].priority = (filter == '' and value) or (filter..','..value)
+		end
+	end
+end
+
 E:AddLib("AceGUI", "AceGUI-3.0")
 E:AddLib("AceConfig", "AceConfig-3.0-ElvUI")
 E:AddLib("AceConfigDialog", "AceConfigDialog-3.0-ElvUI")
 E:AddLib("AceConfigRegistry", "AceConfigRegistry-3.0-ElvUI")
 E:AddLib("AceDBOptions", "AceDBOptions-3.0")
+E:AddLib('ACH', 'LibAceConfigHelper')
 
 local UnitName = UnitName
 local UnitExists = UnitExists
@@ -298,8 +374,14 @@ local function ExportImport_Open(mode)
 			Label1:SetText(" ")
 			Label2:SetText(" ")
 
-			local text
-			local success = D:ImportProfile(Box:GetText())
+			local rawText = Box:GetText()
+			local text = rawText
+			-- Clean up Base64 strings to prevent corruption from discord/forum copy-pasting
+			if text and not text:match("^%s*return") and not text:match("^%s*local") then
+				text = text:gsub("%s+", "")
+			end
+
+			local success = D:ImportProfile(text)
 			if success then
 				text = L["Profile imported successfully!"]
 			else
@@ -317,8 +399,16 @@ local function ExportImport_Open(mode)
 			--Clear labels
 			Label1:SetText(" ")
 			Label2:SetText(" ")
+
+			local rawText = Box:GetText()
+			local text = rawText
+			-- Clean up Base64 strings
+			if text and not text:match("^%s*return") and not text:match("^%s*local") then
+				text = text:gsub("%s+", "")
+			end
+
 			local decodedText
-			local profileType, profileKey, profileData = D:Decode(Box:GetText())
+			local profileType, profileKey, profileData = D:Decode(text)
 			if profileData then
 				decodedText = E:TableToLuaString(profileData)
 			end
@@ -329,7 +419,14 @@ local function ExportImport_Open(mode)
 
 		local oldText = ""
 		local function OnTextChanged()
-			local text = Box:GetText()
+			local rawText = Box:GetText()
+			local text = rawText
+			
+			-- Clean up Base64 strings to prevent corruption from spaces or newlines
+			if text and not text:match("^%s*return") and not text:match("^%s*local") then
+				text = text:gsub("%s+", "")
+			end
+
 			if text == "" then
 				Label1:SetText(" ")
 				Label2:SetText(" ")

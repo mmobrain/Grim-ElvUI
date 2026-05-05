@@ -193,22 +193,49 @@ function UF:Configure_Castbar(frame)
 				E:DisableMover(castbar.Holder.mover:GetName())
 			end
 		else
-			local isMoved = E:HasMoverBeenMoved(frame:GetName().."CastbarMover") or not castbar.Holder.mover
+			local isMoved = castbar.Holder.mover and E:HasMoverBeenMoved(frame:GetName().."CastbarMover") or false
+			local targetObj = castbar.Holder.mover or castbar.Holder
+			
 			if not isMoved then
-				castbar.Holder.mover:ClearAllPoints()
+				targetObj:ClearAllPoints()
+				
+				if db.castbar.attachTo and db.castbar.position then
+					local attachPoint = self:GetObjectAnchorPoint(frame, db.castbar.attachTo)
+					targetObj:Point(INVERT_ANCHORPOINT[db.castbar.position] or db.castbar.position, attachPoint, db.castbar.position, db.castbar.xOffset or 0, db.castbar.yOffset or 0)
+				else
+					local anchor = frame.Health
+					if frame.USE_POWERBAR and not frame.POWERBAR_DETACHED and not frame.USE_INSET_POWERBAR and not frame.USE_MINI_POWERBAR then
+						anchor = frame.Power
+					end
+					if frame.USE_ENERGYBAR and frame.Energy and frame.Energy:IsShown() then
+						anchor = frame.Energy
+					end
+					if frame.USE_RAGEBAR and frame.Rage and frame.Rage:IsShown() then
+						anchor = frame.Rage
+					end
+					if frame.USE_MANABAR and frame.Mana and frame.Mana:IsShown() then
+						anchor = frame.Mana
+					end
+					if frame.USE_RUNICBAR and frame.Runic and frame.Runic:IsShown() then
+						anchor = frame.Runic
+					end
+					if frame.USE_RUNES and frame.Runes and frame.Runes:IsShown() then
+						anchor = frame.Runes
+					end
+					
+					if frame.ORIENTATION ~= "RIGHT" then
+						targetObj:Point("TOPRIGHT", anchor, "BOTTOMRIGHT", 0, -(frame.BORDER - frame.SPACING))
+					else
+						targetObj:Point("TOPLEFT", anchor, "BOTTOMLEFT", 0, -(frame.BORDER - frame.SPACING))
+					end
+				end
 			end
 
 			castbar:ClearAllPoints()
 			if frame.ORIENTATION ~= "RIGHT" then
 				castbar:Point("BOTTOMRIGHT", castbar.Holder, "BOTTOMRIGHT", -(frame.BORDER+frame.SPACING), frame.BORDER+frame.SPACING)
-				if not isMoved then
-					castbar.Holder.mover:Point("TOPRIGHT", frame, "BOTTOMRIGHT", 0, -(frame.BORDER - frame.SPACING))
-				end
 			else
 				castbar:Point("BOTTOMLEFT", castbar.Holder, "BOTTOMLEFT", frame.BORDER+frame.SPACING, frame.BORDER+frame.SPACING)
-				if not isMoved then
-					castbar.Holder.mover:Point("TOPLEFT", frame, "BOTTOMLEFT", 0, -(frame.BORDER - frame.SPACING))
-				end
 			end
 
 			if castbar.Holder.mover then

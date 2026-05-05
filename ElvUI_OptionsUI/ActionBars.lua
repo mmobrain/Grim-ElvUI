@@ -27,6 +27,12 @@ local textPoints = {
 
 local ACD = E.Libs.AceConfigDialog
 
+local function IsShamanClass()
+    local locClass, tokenClass = UnitClass("player")
+    return E.myclass == "SHAMAN" or E.myclass == "Hero" or E.myclass == "HERO"
+        or locClass == "Hero" or tokenClass == "Hero"
+end
+
 local function BuildABConfig()
 	group.general = {
 		order = 1,
@@ -325,13 +331,13 @@ local function BuildABConfig()
 			}
 		}
 	}
-	if E.myclass == "SHAMAN" then
+	if IsShamanClass() then
 		group.barTotem = {
 			order = 2,
 			type = "group",
 			name = L[TUTORIAL_TITLE47],
 			guiInline = false,
-			disabled = function() return not E.ActionBars.Initialized or not E.myclass == "SHAMAN" end,
+			disabled = function() return not E.ActionBars.Initialized or not IsShamanClass() end,
 			get = function(info) return E.db.actionbar.barTotem[info[#info]] end,
 			set = function(info, value) E.db.actionbar.barTotem[info[#info]] = value AB:PositionAndSizeBarTotem() end,
 			args = {
@@ -1004,7 +1010,8 @@ local function BuildABConfig()
 	end
 end
 
-local shamanOrder = E.myclass ~= "SHAMAN" and 1 or 0
+
+local shamanOrder = IsShamanClass() and 1 or 0
 E.Options.args.actionbar = {
 	type = "group",
 	name = L["ActionBars"],
@@ -1067,12 +1074,12 @@ E.Options.args.actionbar = {
 			name = " "
 		},
 		totemBarShortcut = {
-			order = E.myclass ~= "SHAMAN" and 21 or 10,
+			order = IsShamanClass() and 21 or 10,
 			type = "execute",
 			name = L["TUTORIAL_TITLE47"],
 			func = function() ACD:SelectGroup("ElvUI", "actionbar", "barTotem") end,
 			disabled = function() return not E.ActionBars.Initialized end,
-			hidden = E.myclass ~= "SHAMAN" and true or false
+			hidden = IsShamanClass() and true or false,
 		},
 		microbarShortcut = {
 			order = 11 - shamanOrder,

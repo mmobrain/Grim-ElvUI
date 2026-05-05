@@ -1085,7 +1085,8 @@ local function EnsureCustomResourceDB(groupName, resourceKey)
 	return db
 end
 
-local function GetOptionsTable_CustomResource(updateFunc, groupName, resourceKey, groupLabel, order, numUnits, hasStrataLevel)
+local function GetOptionsTable_CustomResource(updateFunc, groupName, resourceKey, groupLabel, order, numUnits, hasStrataLevel, hasText)
+	if hasText == nil then hasText = true end
 	local config = {
 		order = order,
 		type = "group",
@@ -1134,81 +1135,84 @@ local function GetOptionsTable_CustomResource(updateFunc, groupName, resourceKey
 				max = 100,
 				step = 1
 			},
-			textColor = {
-				order = 6,
-				type = "group",
-				name = L["Text Color"],
-				guiInline = true,
-				args = {
-					enable = {
-						order = 1,
-						type = "toggle",
-						name = L["Custom Color"],
-						desc = "Force a specific color for the text. Uncheck to use tags like [energycolor] or [ragecolor].",
-						width = "half",
-						get = function()
-							local db = EnsureCustomResourceDB(groupName, resourceKey)
-							return db.colors.enable
-						end,
-						set = function(info, value)
-							local db = EnsureCustomResourceDB(groupName, resourceKey)
-							db.colors.enable = value
-							updateFunc(UF, groupName, numUnits)
-						end,
-					},
-					color = {
-						order = 2,
-						type = "color",
-						name = L["Color"],
-						hasAlpha = true,
-						get = function()
-							local db = EnsureCustomResourceDB(groupName, resourceKey)
-							local t = db.colors.color
-							return t.r, t.g, t.b, t.a, 1, 1, 1, 1
-						end,
-						set = function(info, r, g, b, a)
-							local db = EnsureCustomResourceDB(groupName, resourceKey)
-							local t = db.colors.color
-							t.r, t.g, t.b, t.a = r, g, b, a
-							updateFunc(UF, groupName, numUnits)
-						end,
-						disabled = function()
-							local db = EnsureCustomResourceDB(groupName, resourceKey)
-							return not db.colors.enable
-						end,
-					},
-				},
-			},
-			configureButton = {
-				order = 7,
-				type = "execute",
-				name = L["Coloring"],
-				desc = L["This opens the UnitFrames Color settings."],
-				func = function()
-					ACD:SelectGroup("ElvUI", "unitframe", "general", "allColorsGroup", "powerGroup")
-				end,
-			},
-			position = {
-				order = 8,
-				type = "select",
-				name = L["Text Position"],
-				values = positionValues
-			},
-			attachTextTo = {
-				order = 9,
-				type = "select",
-				name = L["Attach Text To"],
-				values = attachToValues
-			},
-			text_format = {
-				order = 100,
-				type = "input",
-				name = L["Text Format"],
-				width = "full",
-				desc = L["TEXT_FORMAT_DESC"]
-			},
 		},
 	}
+
+	if hasText then
+		config.args.textColor = {
+			order = 6,
+			type = "group",
+			name = L["Text Color"],
+			guiInline = true,
+			args = {
+				enable = {
+					order = 1,
+					type = "toggle",
+					name = L["Custom Color"],
+					desc = "Force a specific color for the text. Uncheck to use tags like [energycolor] or [ragecolor].",
+					width = "half",
+					get = function()
+						local db = EnsureCustomResourceDB(groupName, resourceKey)
+						return db.colors.enable
+					end,
+					set = function(info, value)
+						local db = EnsureCustomResourceDB(groupName, resourceKey)
+						db.colors.enable = value
+						updateFunc(UF, groupName, numUnits)
+					end,
+				},
+				color = {
+					order = 2,
+					type = "color",
+					name = L["Color"],
+					hasAlpha = true,
+					get = function()
+						local db = EnsureCustomResourceDB(groupName, resourceKey)
+						local t = db.colors.color
+						return t.r, t.g, t.b, t.a, 1, 1, 1, 1
+					end,
+					set = function(info, r, g, b, a)
+						local db = EnsureCustomResourceDB(groupName, resourceKey)
+						local t = db.colors.color
+						t.r, t.g, t.b, t.a = r, g, b, a
+						updateFunc(UF, groupName, numUnits)
+					end,
+					disabled = function()
+						local db = EnsureCustomResourceDB(groupName, resourceKey)
+						return not db.colors.enable
+					end,
+				},
+			},
+		}
+		config.args.configureButton = {
+			order = 7,
+			type = "execute",
+			name = L["Coloring"],
+			desc = L["This opens the UnitFrames Color settings."],
+			func = function()
+				ACD:SelectGroup("ElvUI", "unitframe", "general", "allColorsGroup", "powerGroup")
+			end,
+		}
+		config.args.position = {
+			order = 8,
+			type = "select",
+			name = L["Text Position"],
+			values = positionValues
+		}
+		config.args.attachTextTo = {
+			order = 9,
+			type = "select",
+			name = L["Attach Text To"],
+			values = attachToValues
+		}
+		config.args.text_format = {
+			order = 100,
+			type = "input",
+			name = L["Text Format"],
+			width = "full",
+			desc = L["TEXT_FORMAT_DESC"]
+		}
+	end
 
 	if hasStrataLevel then
 		config.args.strataAndLevel = {
@@ -1634,10 +1638,39 @@ local function GetOptionsTable_Castbar(hasTicks, updateFunc, groupName, numUnits
 				type = "toggle",
 				name = L["Inside Information Panel"],
 				desc = L["Display the castbar inside the information panel, the icon will be displayed outside the main unitframe."],
-				disabled = function() return not E.db.unitframe.units[groupName].infoPanel or not E.db.unitframe.units[groupName].infoPanel.enable end
+				--disabled = function() return not E.db.unitframe.units[groupName].infoPanel or not E.db.unitframe.units[groupName].infoPanel.enable end
+			},
+			attachTo = {
+				order = 13,
+				type = "select",
+				name = L["Attach To"],
+				desc = L["The object you want to attach to."],
+				values = attachToValues,
+				disabled = function() return E.db.unitframe.units[groupName].castbar.insideInfoPanel end
+			},
+			position = {
+				order = 14,
+				type = "select",
+				name = L["Position"],
+				values = positionValues,
+				disabled = function() return E.db.unitframe.units[groupName].castbar.insideInfoPanel end
+			},
+			xOffset = {
+				order = 15,
+				type = "range",
+				name = L["X-Offset"],
+				min = -300, max = 300, step = 1,
+				disabled = function() return E.db.unitframe.units[groupName].castbar.insideInfoPanel end
+			},
+			yOffset = {
+				order = 16,
+				type = "range",
+				name = L["Y-Offset"],
+				min = -300, max = 300, step = 1,
+				disabled = function() return E.db.unitframe.units[groupName].castbar.insideInfoPanel end
 			},
 			iconSettings = {
-				order = 13,
+				order = 17,
 				type = "group",
 				name = L["Icon"],
 				guiInline = true,
@@ -1697,7 +1730,7 @@ local function GetOptionsTable_Castbar(hasTicks, updateFunc, groupName, numUnits
 				}
 			},
 			strataAndLevel = {
-				order = 14,
+				order = 18,
 				type = "group",
 				name = L["Strata and Level"],
 				get = function(info) return E.db.unitframe.units[groupName].castbar.strataAndLevel[info[#info]] end,
@@ -1745,13 +1778,13 @@ local function GetOptionsTable_Castbar(hasTicks, updateFunc, groupName, numUnits
 
 	if hasTicks then
 		config.args.displayTarget = {
-			order = 11,
+			order = 11.5,
 			type = "toggle",
 			name = L["Display Target"],
 			desc = L["Display the target of your current cast. Useful for mouseover casts."]
 		}
 		config.args.ticks = {
-			order = 12,
+			order = 19,
 			type = "group",
 			name = L["Ticks"],
 			guiInline = true,
@@ -3967,7 +4000,8 @@ E.Options.args.unitframe.args.player = {
 		energy = GetOptionsTable_CustomResource(UF.CreateAndUpdateUF, 'player', 'energy', L['Energy'] or 'Energy', 210, nil, true),
 		rage = GetOptionsTable_CustomResource(UF.CreateAndUpdateUF, 'player', 'rage', L['Rage'] or 'Rage', 220, nil, true),
 		mana = GetOptionsTable_CustomResource(UF.CreateAndUpdateUF, 'player', 'mana', L['Mana'] or 'Mana', 230, nil, true),
-		-- runic = GetOptionsTable_CustomResource(UF.CreateAndUpdateUF, 'player', 'runic', L['Runic Power'] or 'Runic Power', 240, nil, true),
+		runic = GetOptionsTable_CustomResource(UF.CreateAndUpdateUF, 'player', 'runic', L['Runic Power'] or 'Runic Power', 240, nil, true),
+		runes = GetOptionsTable_CustomResource(UF.CreateAndUpdateUF, 'player', 'runes', L['Runes'] or 'Runes', 245, nil, true, false),
 		name = GetOptionsTable_Name(UF.CreateAndUpdateUF, 'player'),
 		portrait = GetOptionsTable_Portrait(UF.CreateAndUpdateUF, "player"),
 		fader = GetOptionsTable_Fader(UF.CreateAndUpdateUF, "player"),

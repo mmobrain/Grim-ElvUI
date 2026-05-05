@@ -60,6 +60,7 @@ do
 	AddOn:AddLib("AceDB", "AceDB-3.0")
 	AddOn:AddLib("EP", "LibElvUIPlugin-1.0")
 	AddOn:AddLib("LSM", "LibSharedMedia-3.0")
+	AddOn:AddLib('ACH', 'LibAceConfigHelper')
 	AddOn:AddLib("ACL", "AceLocale-3.0-ElvUI")
 	AddOn:AddLib("LAB", "LibActionButton-1.0-ElvUI")
 	AddOn:AddLib("LAI", "LibAuraInfo-1.0-ElvUI", true)
@@ -70,6 +71,7 @@ do
 	AddOn:AddLib("SpellRange", "SpellRange-1.0")
 	AddOn:AddLib("ItemSearch", "LibItemSearch-1.2-ElvUI")
 	AddOn:AddLib("Compress", "LibCompress")
+	AddOn:AddLib('Deflate', 'LibDeflate')
 	AddOn:AddLib("Base64", "LibBase64-1.0-ElvUI")
 	AddOn:AddLib("Translit", "LibTranslit-1.0")
 	-- added on ElvUI_OptionsUI load: AceGUI, AceConfig, AceConfigDialog, AceConfigRegistry, AceDBOptions

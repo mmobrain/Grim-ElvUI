@@ -20,7 +20,7 @@ P.general = {
 	watchFrameHeight = 480,
 	watchFrameAutoHide = true,
 	vehicleSeatIndicatorSize = 128,
-	afk = true,
+	afk = false,
 	numberPrefixStyle = "ENGLISH",
 	decimalLength = 1,
 	font = "PT Sans Narrow",
@@ -1452,7 +1452,7 @@ P.unitframe = {
 				},
 				parent = "FRAME"
 			},
-		      energy = {
+		    energy = {
 				  enable = true,
 				  text_format = "[energycolor][energy:current]",
 				  width = "fill",
@@ -1548,6 +1548,21 @@ P.unitframe = {
 			  -- },
 			  -- parent = "FRAME"
 		    -- },
+		    runes = {
+			  enable = true,
+			  height = 3,
+			  xOffset = 0,
+			  yOffset = 0,
+			  detachFromFrame = false,
+			  detachedWidth = 250,
+			  strataAndLevel = {
+				useCustomStrata = false,
+				frameStrata = "LOW",
+				useCustomLevel = false,
+				frameLevel = 1
+			  },
+			  parent = "FRAME"
+		    },
 			infoPanel = {
 				enable = false,
 				height = 20,
@@ -2732,7 +2747,7 @@ P.unitframe = {
 				sortDirection = "DESCENDING",
 				minDuration = 0,
 				maxDuration = 300,
-				priority = "Blacklist,PlayerBuffs,CastByUnit,Whitelist", --PetTarget Buffs
+				priority = "Blacklist,Personal,PlayerBuffs,CastByUnit,Whitelist", --PetTarget Buffs
 				xOffset = 0,
 				yOffset = 0
 			},

@@ -1,5 +1,12 @@
 # Changelog
 
+## [v6.27 Grimfall fork] - 2026-05-05
+- **UnitFrames:** Fixed Castbar offsets and attachment settings for Party and Raid frames. Castbars will now automatically anchor below the lowest active custom resource bar. Turn off "Inside Information Panel" to change it manually.
+- **UnitFrames:** Added configuration options for the custom Player Rune Bar within the Options UI.
+- **Profiles:** Added native support for importing Ascension ElvUI profiles. 
+- **Bugfix:** Implemented whitespace sanitization for profile imports to fix the "Import string may be corrupted" error caused by copy-pasting strings from Discord or other online sources.
+- **Defaults:** Added missing default profile values for the Player Rune Bar to prevent Lua errors on fresh installations.
+
 ## [v6.26 Grimfall fork] - 2026-04-21
 - **TotemBar fix for Grimfall Server:** Fixed Grimfall Hero/Shaman detection and TotemBar initialization so the bar, settings, bindings, and MultiCast totem selection now work correctly again.
 

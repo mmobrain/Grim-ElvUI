@@ -26,7 +26,10 @@ function UF:Construct_PlayerFrame(frame)
 	frame.Rage = self:Construct_RageBar(frame, true, true, "LEFT")
 	frame.Mana = UF:Construct_ManaBar(frame, true, true, 'LEFT')
 	frame.Runic = UF:Construct_RunicBar(frame, true, true, 'LEFT')
-	frame.Runes = UF:Construct_CustomRunes(frame)
+	
+	if E.myclass ~= "DEATHKNIGHT" then
+		frame.Runes = UF:Construct_CustomRunes(frame)
+	end
 	
 	frame.Name = self:Construct_NameText(frame)
 	frame.Portrait3D = self:Construct_Portrait(frame, "model")
@@ -93,24 +96,24 @@ function UF:Update_PlayerFrame(frame, db)
 		frame.POWERBAR_WIDTH = frame.USE_MINI_POWERBAR and (frame.UNIT_WIDTH - (frame.BORDER*2))/2 or (frame.POWERBAR_DETACHED and db.power.detachedWidth or (frame.UNIT_WIDTH - ((frame.BORDER+frame.SPACING)*2)))
 
 		-- Energy
-		frame.USE_ENERGYBAR = db.energy.enable
-		frame.ENERGYBAR_DETACHED = db.energy.detachFromFrame
-		frame.USE_INSET_ENERGYBAR = not frame.ENERGYBAR_DETACHED and db.energy.width == "inset" and frame.USE_ENERGYBAR
-		frame.USE_MINI_ENERGYBAR = (not frame.ENERGYBAR_DETACHED and db.energy.width == "spaced" and frame.USE_ENERGYBAR)
-		frame.USE_ENERGYBAR_OFFSET = db.energy.offset ~= 0 and frame.USE_ENERGYBAR and not frame.ENERGYBAR_DETACHED
+		frame.USE_ENERGYBAR = db.energy and db.energy.enable
+		frame.ENERGYBAR_DETACHED = db.energy and db.energy.detachFromFrame
+		frame.USE_INSET_ENERGYBAR = not frame.ENERGYBAR_DETACHED and db.energy and db.energy.width == "inset" and frame.USE_ENERGYBAR
+		frame.USE_MINI_ENERGYBAR = (not frame.ENERGYBAR_DETACHED and db.energy and db.energy.width == "spaced" and frame.USE_ENERGYBAR)
+		frame.USE_ENERGYBAR_OFFSET = db.energy and db.energy.offset ~= 0 and frame.USE_ENERGYBAR and not frame.ENERGYBAR_DETACHED
 		frame.ENERGYBAR_OFFSET = frame.USE_ENERGYBAR_OFFSET and db.energy.offset or 0
-		frame.ENERGYBAR_HEIGHT = not frame.USE_ENERGYBAR and 0 or db.energy.height
-		frame.ENERGYBAR_WIDTH = frame.USE_MINI_ENERGYBAR and (frame.UNIT_WIDTH - (frame.BORDER*2))/2 or (frame.ENERGYBAR_DETACHED and db.energy.detachedWidth or (frame.UNIT_WIDTH - ((frame.BORDER+frame.SPACING)*2)))
+		frame.ENERGYBAR_HEIGHT = not frame.USE_ENERGYBAR and 0 or (db.energy and db.energy.height) or 0
+		frame.ENERGYBAR_WIDTH = frame.USE_MINI_ENERGYBAR and (frame.UNIT_WIDTH - (frame.BORDER*2))/2 or (frame.ENERGYBAR_DETACHED and db.energy and db.energy.detachedWidth or (frame.UNIT_WIDTH - ((frame.BORDER+frame.SPACING)*2)))
 
 		-- Rage
-		frame.USE_RAGEBAR = db.rage.enable
-		frame.RAGEBAR_DETACHED = db.rage.detachFromFrame
-		frame.USE_INSET_RAGEBAR = not frame.RAGEBAR_DETACHED and db.rage.width == "inset" and frame.USE_RAGEBAR
-		frame.USE_MINI_RAGEBAR = (not frame.RAGEBAR_DETACHED and db.rage.width == "spaced" and frame.USE_RAGEBAR)
-		frame.USE_RAGEBAR_OFFSET = db.rage.offset ~= 0 and frame.USE_RAGEBAR and not frame.RAGEBAR_DETACHED
+		frame.USE_RAGEBAR = db.rage and db.rage.enable
+		frame.RAGEBAR_DETACHED = db.rage and db.rage.detachFromFrame
+		frame.USE_INSET_RAGEBAR = not frame.RAGEBAR_DETACHED and db.rage and db.rage.width == "inset" and frame.USE_RAGEBAR
+		frame.USE_MINI_RAGEBAR = (not frame.RAGEBAR_DETACHED and db.rage and db.rage.width == "spaced" and frame.USE_RAGEBAR)
+		frame.USE_RAGEBAR_OFFSET = db.rage and db.rage.offset ~= 0 and frame.USE_RAGEBAR and not frame.RAGEBAR_DETACHED
 		frame.RAGEBAR_OFFSET = frame.USE_RAGEBAR_OFFSET and db.rage.offset or 0
-		frame.RAGEBAR_HEIGHT = not frame.USE_RAGEBAR and 0 or db.rage.height
-		frame.RAGEBAR_WIDTH = frame.USE_MINI_RAGEBAR and (frame.UNIT_WIDTH - (frame.BORDER*2))/2 or (frame.RAGEBAR_DETACHED and db.rage.detachedWidth or (frame.UNIT_WIDTH - ((frame.BORDER+frame.SPACING)*2)))
+		frame.RAGEBAR_HEIGHT = not frame.USE_RAGEBAR and 0 or (db.rage and db.rage.height) or 0
+		frame.RAGEBAR_WIDTH = frame.USE_MINI_RAGEBAR and (frame.UNIT_WIDTH - (frame.BORDER*2))/2 or (frame.RAGEBAR_DETACHED and db.rage and db.rage.detachedWidth or (frame.UNIT_WIDTH - ((frame.BORDER+frame.SPACING)*2)))
 		
 		frame.USE_MANABAR = db.mana and db.mana.enable
 		frame.MANABAR_DETACHED = db.mana and db.mana.detachFromFrame
@@ -128,13 +131,16 @@ function UF:Update_PlayerFrame(frame, db)
 		frame.RUNICBAR_OFFSET = frame.USE_RUNICBAR_OFFSET and db.runic.offset or 0
 		frame.RUNICBAR_HEIGHT = not frame.USE_RUNICBAR and 0 or (db.runic and db.runic.height) or 0
 
+		frame.USE_RUNES = db.runes and db.runes.enable
+		frame.RUNES_DETACHED = db.runes and db.runes.detachFromFrame
+
 		frame.USE_PORTRAIT = db.portrait and db.portrait.enable
 		frame.USE_PORTRAIT_OVERLAY = frame.USE_PORTRAIT and (db.portrait.overlay or frame.ORIENTATION == "MIDDLE")
 		frame.PORTRAIT_WIDTH = (frame.USE_PORTRAIT_OVERLAY or not frame.USE_PORTRAIT) and 0 or db.portrait.width
 
 		frame.MAX_CLASS_BAR = frame.MAX_CLASS_BAR or UF.classMaxResourceBar[E.myclass] or 0
 		frame.USE_CLASSBAR = db.classbar.enable
-		frame.CLASSBAR_SHOWN = frame[frame.ClassBar]:IsShown()
+		frame.CLASSBAR_SHOWN = frame.ClassBar and frame[frame.ClassBar] and frame[frame.ClassBar]:IsShown()
 		frame.CLASSBAR_DETACHED = db.classbar.detachFromFrame
 		frame.USE_MINI_CLASSBAR = db.classbar.fill == "spaced" and frame.USE_CLASSBAR
 		frame.CLASSBAR_HEIGHT = frame.USE_CLASSBAR and db.classbar.height or 0
